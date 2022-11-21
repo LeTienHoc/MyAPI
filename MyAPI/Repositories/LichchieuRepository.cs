@@ -16,6 +16,25 @@ namespace MyAPI.Repositories
             _context = context;
             _mapper = mapper;
         }
+        public string ma()
+        {
+            int result = _context.Lichchieus.Count() + 1;
+            if (result >= 0 && result < 10)
+                return "LC00000000" + result;
+            else if (result >= 10 && result < 100)
+                return "LC0000000" + result;
+            else if (result >= 100 && result < 1000)
+                return "LC00000" + result;
+            else if (result >= 1000 && result < 10000)
+                return "LC0000" + result;
+            else if (result >= 10000 && result < 100000)
+                return "LC000" + result;
+            else if (result >= 100000 && result < 1000000)
+                return "LC00" + result;
+            else if (result >= 1000000 && result < 10000000)
+                return "LC0" + result;
+            else return "LC" + result;
+        }
         public async Task<string> Add(LichchieuModel Lichchieu)
         {
             var newLichchieu = _mapper.Map<Lichchieu>(Lichchieu);
@@ -24,11 +43,11 @@ namespace MyAPI.Repositories
             {
                 _context.Lichchieus!.Add(newLichchieu);
                 await _context.SaveChangesAsync();
-            }    
-            else
-            {
-                TempDataAttribute["Alert"] = "";
-            }    
+            }
+            //else
+            //{
+            //    TempDataAttribute["Alert"] = "";
+            //}    
             //string ma = "";
             //var select = await _context.Lichchieus.ToListAsync();
             //int count = select.Count();
@@ -54,8 +73,8 @@ namespace MyAPI.Repositories
             //    }
             //    ma = ma + k.ToString();
             //}
-            //newLichchieu.MaLichchieu = ma;
-            
+            newLichchieu.MaLichChieu = ma();
+
 
             return newLichchieu.MaLichChieu;
         }

@@ -15,6 +15,25 @@ namespace MyAPI.Repositories
             _context = context;
             _mapper = mapper;
         }
+        public string ma()
+        {
+            int result = _context.Taikhoans.Count() + 1;
+            if (result >= 0 && result < 10)
+                return "XC00000000" + result;
+            else if (result >= 10 && result < 100)
+                return "XC0000000" + result;
+            else if (result >= 100 && result < 1000)
+                return "XC00000" + result;
+            else if (result >= 1000 && result < 10000)
+                return "XC0000" + result;
+            else if (result >= 10000 && result < 100000)
+                return "XC000" + result;
+            else if (result >= 100000 && result < 1000000)
+                return "XC00" + result;
+            else if (result >= 1000000 && result < 10000000)
+                return "XC0" + result;
+            else return "XC" + result;
+        }
         public async Task<string> Add(XuatchieuModel Xuatchieu)
         {
             var newXuatchieu = _mapper.Map<Xuatchieu>(Xuatchieu);
@@ -43,7 +62,7 @@ namespace MyAPI.Repositories
             //    }
             //    ma = ma + k.ToString();
             //}
-            //newXuatchieu.MaXuatchieu = ma;
+            newXuatchieu.MaXc = ma();
             _context.Xuatchieus!.Add(newXuatchieu);
             await _context.SaveChangesAsync();
 
