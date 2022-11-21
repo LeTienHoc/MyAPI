@@ -15,6 +15,25 @@ namespace MyAPI.Repositories
             _context = context;
             _mapper = mapper;
         }
+        public string ma()
+        {
+            int result = _context.Khuyenmais.Count() + 1;
+            if (result >= 0 && result < 10)
+                return "KM00000000" + result;
+            else if (result >= 10 && result < 100)
+                return "KM0000000" + result;
+            else if (result >= 100 && result < 1000)
+                return "KM00000" + result;
+            else if (result >= 1000 && result < 10000)
+                return "KM0000" + result;
+            else if (result >= 10000 && result < 100000)
+                return "KM000" + result;
+            else if (result >= 100000 && result < 1000000)
+                return "KM00" + result;
+            else if (result >= 1000000 && result < 10000000)
+                return "KM0" + result;
+            else return "KM" + result;
+        }
         public async Task<string> Add(KhuyenmaiModel Khuyenmai)
         {
             var newKhuyenmai = _mapper.Map<Khuyenmai>(Khuyenmai);
@@ -43,7 +62,7 @@ namespace MyAPI.Repositories
             //    }
             //    ma = ma + k.ToString();
             //}
-            //newKhuyenmai.MaKhuyenmai = ma;
+            newKhuyenmai.MaKm = ma();
             _context.Khuyenmais!.Add(newKhuyenmai);
             await _context.SaveChangesAsync();
 

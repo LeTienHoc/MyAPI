@@ -15,6 +15,25 @@ namespace MyAPI.Repositories
             _context = context;
             _mapper = mapper;
         }
+        public string ma()
+        {
+            int result = _context.Khachhangs.Count() + 1;
+            if (result >= 0 && result < 10)
+                return "KH00000000" + result;
+            else if (result >= 10 && result < 100)
+                return "KH0000000" + result;
+            else if (result >= 100 && result < 1000)
+                return "KH00000" + result;
+            else if (result >= 1000 && result < 10000)
+                return "KH0000" + result;
+            else if (result >= 10000 && result < 100000)
+                return "KH000" + result;
+            else if (result >= 100000 && result < 1000000)
+                return "KH00" + result;
+            else if (result >= 1000000 && result < 10000000)
+                return "KH0" + result;
+            else return "KH" + result;
+        }
         public async Task<string> Add(KhachhangModel Khachhang)
         {
             var newKhachhang = _mapper.Map<Khachhang>(Khachhang);
@@ -43,7 +62,7 @@ namespace MyAPI.Repositories
             //    }
             //    ma = ma + k.ToString();
             //}
-            //newKhachhang.MaKhachhang = ma;
+            newKhachhang.MaKh = ma();
             _context.Khachhangs!.Add(newKhachhang);
             await _context.SaveChangesAsync();
 

@@ -15,6 +15,25 @@ namespace MyAPI.Repositories
             _context = context;
             _mapper = mapper;
         }
+        public string ma()
+        {
+            int result = _context.Daodiens.Count() + 1;
+            if (result >= 0 && result < 10)
+                return "DD00000000" + result;
+            else if (result >= 10 && result < 100)
+                return "DD0000000" + result;
+            else if (result >= 100 && result < 1000)
+                return "DD00000" + result;
+            else if (result >= 1000 && result < 10000)
+                return "DD0000" + result;
+            else if (result >= 10000 && result < 100000)
+                return "DD000" + result;
+            else if (result >= 100000 && result < 1000000)
+                return "DD00" + result;
+            else if (result >= 1000000 && result < 10000000)
+                return "DD0" + result;
+            else return "DD" + result;
+        }
         public async Task<string> Add(DaodienModel daodien)
         {
             var newDaodien = _mapper.Map<Daodien>(daodien);
@@ -43,7 +62,7 @@ namespace MyAPI.Repositories
             //    }
             //    ma = ma + k.ToString();
             //}
-            //newDaodien.MaDaoDien = ma;
+            newDaodien.MaDaoDien = ma();
             _context.Daodiens!.Add(newDaodien);
             await _context.SaveChangesAsync();
 
