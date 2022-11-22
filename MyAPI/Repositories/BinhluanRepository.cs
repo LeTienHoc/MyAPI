@@ -15,6 +15,25 @@ namespace MyAPI.Repositories
             _context = context;
             _mapper = mapper;
         }
+        public string id()
+        {
+            int result = _context.Binhluans.Count() + 1;
+            if (result >= 0 && result < 10)
+                return "IS00000000" + result;
+            else if (result >= 10 && result < 100)
+                return "IS0000000" + result;
+            else if (result >= 100 && result < 1000)
+                return "IS00000" + result;
+            else if (result >= 1000 && result < 10000)
+                return "IS0000" + result;
+            else if (result >= 10000 && result < 100000)
+                return "IS000" + result;
+            else if (result >= 100000 && result < 1000000)
+                return "IS00" + result;
+            else if (result >= 1000000 && result < 10000000)
+                return "IS0" + result;
+            else return "IS" + result;
+        }
         public async Task<string> Add(BinhluanModel Binhluan)
         {
             var newBinhluan = _mapper.Map<Binhluan>(Binhluan);
@@ -43,7 +62,7 @@ namespace MyAPI.Repositories
             //    }
             //    ma = ma + k.ToString();
             //}
-            //newBinhluan.MaBinhluan = ma;
+            newBinhluan.MaBl = id();
             _context.Binhluans!.Add(newBinhluan);
             await _context.SaveChangesAsync();
 

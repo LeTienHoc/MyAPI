@@ -17,7 +17,7 @@ namespace MyAPI.Repositories
         }
         public string ma()
         {
-            int result = _context.Taikhoans.Count() + 1;
+            int result = _context.Ves.Count() + 1;
             if (result >= 0 && result < 10)
                 return "V00000000" + result;
             else if (result >= 10 && result < 100)
