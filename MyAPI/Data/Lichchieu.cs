@@ -6,7 +6,9 @@ namespace MyAPI.Data
 {
     public partial class Lichchieu
     {
+        [Required]
         public string MaLichChieu { get; set; }
+        [Required]
         public string MaNhaKich { get; set; }
         [Required]
         public DateTime? NgayBd { get; set; }

@@ -1,7 +1,14 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using MyAPI.Data;
+using MyAPI.Models;
 using MyAPI.Repositories;
+using Swashbuckle.AspNetCore.Filters;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +17,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    {
+        Description = "Standard Authorization header using the Bearer Schema(\"bearer {token}\")",
+        In = ParameterLocation.Header,
+        Name ="Authorization",
+        Type = SecuritySchemeType.ApiKey
+    }) ;
+
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
+});
 
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
     policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
@@ -37,6 +55,31 @@ builder.Services.AddScoped<INhakichRepository, NhakichRepository>();
 builder.Services.AddScoped<ITaikhoanRepository, TaikhoanRepository>();
 builder.Services.AddScoped<IVeRepository, VeRepository>();
 builder.Services.AddScoped<IXuatchieuRepository, XuatchieuRepository>();
+builder.Services.AddScoped<ILichchieuKhuyenmaiRepository, LichchieuKhuyenmaiRepository>();
+
+
+
+
+var secretKey = builder.Configuration["AppSettings:SecretKey"];
+var secretKeyBytes = Encoding.UTF8.GetBytes(secretKey);
+
+builder.Services.Configure<AppSetting>(builder.Configuration.GetSection("AppSettings"));
+
+builder.Services.AddAuthentication
+    (JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt =>
+    {
+        opt.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(secretKeyBytes),
+
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
 
 var app = builder.Build();
 
@@ -48,6 +91,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

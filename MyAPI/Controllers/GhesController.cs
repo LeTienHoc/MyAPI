@@ -7,6 +7,7 @@ using System.Data;
 
 namespace MyAPI.Controllers
 {
+    //[Authorize(Roles = "quantrinhakich")]
     [Route("api/[controller]")]
     [ApiController]
     public class GhesController : ControllerBase

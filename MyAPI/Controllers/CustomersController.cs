@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MyAPI.Data;
 using MyAPI.Models;
+using MyAPI.Repositories;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -19,11 +20,13 @@ namespace MyAPI.Controllers
     {
         private readonly MyDbContext _context;
         private readonly AppSetting _appSettings;
+        private readonly IKhachhangRepository _khrepo;
 
-        public CustomersController(MyDbContext context, IOptionsMonitor<AppSetting> optionsMonitor)
+        public CustomersController(MyDbContext context, IOptionsMonitor<AppSetting> optionsMonitor,IKhachhangRepository khrepo)
         {
             _context = context;
             _appSettings = optionsMonitor.CurrentValue;
+            _khrepo = khrepo;
         }
         [HttpPost("LoginKhachhang")]
         public IActionResult Validate(LoginModel model)
@@ -47,6 +50,41 @@ namespace MyAPI.Controllers
                 Message = "Đăng nhập thành công",
                 Data = GenerateToken(customer)
             });
+        }
+        [HttpPost("SignUp")]
+        public async Task<IActionResult> SignUp(KhachhangModel model)
+        {
+            try
+            {
+                var newKhachhangId = await _khrepo.Add(model);
+                if (newKhachhangId == null)
+                {
+                    return BadRequest(new ApiResponse
+                    {
+                        Success=false,
+                        Message="Tuổi phải lớn hơn 16"
+                    });
+                } 
+                else
+                {
+                    if(newKhachhangId=="")
+                    {
+                        return BadRequest(new ApiResponse
+                        {
+                            Success = false,
+                            Message = "Mật khẩu không khớp"
+                        });
+                    }
+                    
+                    var Khachhang = await _khrepo.GetByID(newKhachhangId);
+                    return Khachhang == null ? NotFound() : Ok(Khachhang);
+                }    
+                
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
 
         private string GenerateToken(Khachhang khachhang)

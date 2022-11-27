@@ -37,15 +37,27 @@ namespace MyAPI.Repositories
         public async Task<string> Add(KhachhangModel Khachhang)
         {
             var newKhachhang = _mapper.Map<Khachhang>(Khachhang);
-            
-            newKhachhang.MaKh = ma();
-            if(newKhachhang.MatKhau == newKhachhang.ConfirmMatKhau)
-            {
-                _context.Khachhangs!.Add(newKhachhang);
-                await _context.SaveChangesAsync();
-            }    
-            
 
+            var loi1 ="";
+            
+            int ngaysinh = DateTime.UtcNow.Year - newKhachhang.NgaySinh.Value.Year;
+            if(ngaysinh>16)
+            {
+                if (newKhachhang.MatKhau == newKhachhang.ConfirmMatKhau)
+                {
+                    newKhachhang.MaKh = ma();
+                    _context.Khachhangs!.Add(newKhachhang);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    return loi1 ;
+                }
+            }    
+            else
+            {
+                return null;
+            }    
             return newKhachhang.MaKh;
         }
 
@@ -71,14 +83,28 @@ namespace MyAPI.Repositories
             return _mapper.Map<KhachhangModel>(Khachhang);
         }
 
-        public async Task Update(string id, KhachhangModel Khachhang)
+        public async Task<string> Update(string id, KhachhangModel Khachhang)
         {
-            if(id == Khachhang.MaKh)
+            var updateKhachhang = _mapper.Map<Khachhang>(Khachhang);
+            var loi = "";
+            if (id == Khachhang.MaKh)
             {
-                var updateKhachhang = _mapper.Map<Khachhang>(Khachhang);
-                _context.Khachhangs!.Update(updateKhachhang);
-                await _context.SaveChangesAsync();
-            }    
+                
+                
+                int ngaysinh = DateTime.UtcNow.Year - updateKhachhang.NgaySinh.Value.Year;
+                if (ngaysinh>16)
+                {
+                    if(updateKhachhang.MatKhau==updateKhachhang.ConfirmMatKhau)
+                    {
+                        _context.Khachhangs!.Update(updateKhachhang);
+                        await _context.SaveChangesAsync();
+                    }
+                    return loi;
+                }
+                return null;
+                
+            }
+            return updateKhachhang.MaKh;
         }
 
     }

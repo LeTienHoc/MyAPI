@@ -41,39 +41,15 @@ namespace MyAPI.Repositories
 
             if(newLichchieu.NgayBd<newLichchieu.NgayKt)
             {
+                newLichchieu.MaLichChieu = ma();
                 _context.Lichchieus!.Add(newLichchieu);
                 await _context.SaveChangesAsync();
             }
-            //else
-            //{
-            //    TempDataAttribute["Alert"] = "";
-            //}    
-            //string ma = "";
-            //var select = await _context.Lichchieus.ToListAsync();
-            //int count = select.Count();
-            //if (count <= 0)
-            //{
-            //    ma = "DD001";
-            //}
-            //else
-            //{
-            //    int k;
-            //    ma = "DD";
-            //    int h;
-            //    h = count - 1;
-            //    k = Convert.ToInt32((h).ToString().Substring(2, 3));
-            //    k = k + 1;
-            //    if (k < 10)
-            //    {
-            //        ma = ma + "00";
-            //    }
-            //    else if (k < 100)
-            //    {
-            //        ma = ma + "0";
-            //    }
-            //    ma = ma + k.ToString();
-            //}
-            newLichchieu.MaLichChieu = ma();
+            else
+            {
+                return null;
+            }    
+            
 
 
             return newLichchieu.MaLichChieu;

@@ -6,7 +6,7 @@ using MyAPI.Repositories;
 
 namespace MyAPI.Controllers
 {
-    [Authorize(Roles ="admin")]
+    //[Authorize(Roles ="admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class KhachhangsController : ControllerBase
@@ -43,20 +43,60 @@ namespace MyAPI.Controllers
             try
             {
                 var newKhachhangId = await _KhachhangRepo.Add(model);
-                var Khachhang = await _KhachhangRepo.GetByID(newKhachhangId);
-                return Khachhang == null ? NotFound() : Ok(Khachhang);
+                if (newKhachhangId == null)
+                {
+                    return BadRequest(new ApiResponse
+                    {
+                        Success = false,
+                        Message = "Tuổi phải lớn hơn 16"
+                    });
+                }
+                else
+                {
+                    if (newKhachhangId == "")
+                    {
+                        return BadRequest(new ApiResponse
+                        {
+                            Success = false,
+                            Message = "Mật khẩu không khớp"
+                        });
+                    }
+
+                    var Khachhang = await _KhachhangRepo.GetByID(newKhachhangId);
+                    return Khachhang == null ? NotFound() : Ok(Khachhang);
+                }
+
             }
             catch
             {
                 return BadRequest();
             }
-            
+
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateKhachhang(string id,KhachhangModel model)
         {
-            await _KhachhangRepo.Update(id, model);
+           var updatekh = await _KhachhangRepo.Update(id, model);
+            if(updatekh == null)
+            {
+                return BadRequest(new ApiResponse
+                {
+                    Success = false,
+                    Message = "Tuổi phải lớn hơn 16"
+                });
+            } 
+            else
+            {
+                if(updatekh == "")
+                {
+                    return BadRequest(new ApiResponse
+                    {
+                        Success = false,
+                        Message = "Mật khẩu không khớp"
+                    });
+                }    
+            }    
             return Ok();
         }
 

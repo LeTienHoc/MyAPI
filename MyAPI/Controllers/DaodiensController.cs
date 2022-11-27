@@ -6,6 +6,7 @@ using MyAPI.Repositories;
 
 namespace MyAPI.Controllers
 {
+    //[Authorize(Roles = "quantrinhakich")]
     [Route("api/[controller]")]
     [ApiController]
     public class DaodiensController : ControllerBase

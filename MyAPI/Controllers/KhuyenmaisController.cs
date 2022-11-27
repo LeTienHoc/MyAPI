@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.Models;
 using MyAPI.Repositories;
+using System.Data;
 
 namespace MyAPI.Controllers
 {
+    //[Authorize(Roles = "quantrinhakich")]
     [Route("api/[controller]")]
     [ApiController]
     public class KhuyenmaisController : ControllerBase
@@ -41,9 +44,22 @@ namespace MyAPI.Controllers
         {
             try
             {
+
                 var newKhuyenmaiId = await _KhuyenmaiRepo.Add(model);
-                var Khuyenmai = await _KhuyenmaiRepo.GetByID(newKhuyenmaiId);
-                return Khuyenmai == null ? NotFound() : Ok(Khuyenmai);
+                if(newKhuyenmaiId!=null)
+                {
+                    var Khuyenmai = await _KhuyenmaiRepo.GetByID(newKhuyenmaiId);
+                    return Khuyenmai == null ? NotFound() : Ok(Khuyenmai);
+                }    
+                else
+                {
+                    return BadRequest(new ApiResponse
+                    {
+                        Success = false,
+                        Message = "Ngày bắt đầu phải trước ngày kết thúc"
+                    });
+                }    
+                
             }
             catch
             {

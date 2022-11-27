@@ -37,34 +37,17 @@ namespace MyAPI.Repositories
         public async Task<string> Add(KhuyenmaiModel Khuyenmai)
         {
             var newKhuyenmai = _mapper.Map<Khuyenmai>(Khuyenmai);
-            //string ma = "";
-            //var select = await _context.Khuyenmais.ToListAsync();
-            //int count = select.Count();
-            //if (count <= 0)
-            //{
-            //    ma = "DD001";
-            //}
-            //else
-            //{
-            //    int k;
-            //    ma = "DD";
-            //    int h;
-            //    h = count - 1;
-            //    k = Convert.ToInt32((h).ToString().Substring(2, 3));
-            //    k = k + 1;
-            //    if (k < 10)
-            //    {
-            //        ma = ma + "00";
-            //    }
-            //    else if (k < 100)
-            //    {
-            //        ma = ma + "0";
-            //    }
-            //    ma = ma + k.ToString();
-            //}
-            newKhuyenmai.MaKm = ma();
-            _context.Khuyenmais!.Add(newKhuyenmai);
-            await _context.SaveChangesAsync();
+            if(newKhuyenmai.NgayBd<newKhuyenmai.NgayKt)
+            {
+                newKhuyenmai.MaKm = ma();
+                _context.Khuyenmais!.Add(newKhuyenmai);
+                await _context.SaveChangesAsync();
+            }  
+            else
+            {
+                return null;
+            }    
+            
 
             return newKhuyenmai.MaKm;
         }
@@ -96,8 +79,13 @@ namespace MyAPI.Repositories
             if(id == Khuyenmai.MaKm)
             {
                 var updateKhuyenmai = _mapper.Map<Khuyenmai>(Khuyenmai);
-                _context.Khuyenmais!.Update(updateKhuyenmai);
-                await _context.SaveChangesAsync();
+                if (updateKhuyenmai.NgayBd < updateKhuyenmai.NgayKt)
+                {
+                    _context.Khuyenmais!.Update(updateKhuyenmai);
+                    await _context.SaveChangesAsync();
+                }    
+                    
+                
             }    
         }
 

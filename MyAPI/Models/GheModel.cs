@@ -1,13 +1,15 @@
-﻿namespace MyAPI.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MyAPI.Models
 {
     public class GheModel
     {
         public string MaGhe { get; set; }
+        [Required]
         public string? NhaKich { get; set; }
-        public string? TenGhe { get; set; }
+        [Required]
         public string? Hang { get; set; }
+        [Required]
         public int? Seat { get; set; }
-        public float? GiaGhe { get; set; }
-        public ulong? TinhTrangGhe { get; set; }
     }
 }
