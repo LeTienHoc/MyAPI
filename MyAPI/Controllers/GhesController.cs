@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.Models;
 using MyAPI.Repositories;
+using System.Data;
 
 namespace MyAPI.Controllers
 {
@@ -35,7 +37,7 @@ namespace MyAPI.Controllers
             var Ghe= await _GheRepo.GetByID(id);
             return  Ghe==null ?NotFound():Ok(Ghe);
         }
-
+        
         [HttpPost]
         public async Task<IActionResult> AddNewGhe(GheModel model)
         {

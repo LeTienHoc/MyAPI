@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MyAPI.Data;
 using MyAPI.Models;
+using System.Security.Cryptography;
 
 namespace MyAPI.Repositories
 {
@@ -37,37 +38,22 @@ namespace MyAPI.Repositories
         public async Task<string> Add(TaikhoanModel Taikhoan)
         {
             var newTaikhoan = _mapper.Map<Taikhoan>(Taikhoan);
-            //string ma = "";
-            //var select = await _context.Taikhoans.ToListAsync();
-            //int count = select.Count();
-            //if (count <= 0)
-            //{
-            //    ma = "DD001";
-            //}
-            //else
-            //{
-            //    int k;
-            //    ma = "DD";
-            //    int h;
-            //    h = count - 1;
-            //    k = Convert.ToInt32((h).ToString().Substring(2, 3));
-            //    k = k + 1;
-            //    if (k < 10)
-            //    {
-            //        ma = ma + "00";
-            //    }
-            //    else if (k < 100)
-            //    {
-            //        ma = ma + "0";
-            //    }
-            //    ma = ma + k.ToString();
-            //}
             newTaikhoan.MaTk = ma();
-            _context.Taikhoans!.Add(newTaikhoan);
-            await _context.SaveChangesAsync();
-
+            if(newTaikhoan.MatKhau == newTaikhoan.ConfirmMatkhau)
+            {
+                _context.Taikhoans!.Add(newTaikhoan);
+                await _context.SaveChangesAsync();
+            }    
             return newTaikhoan.MaTk;
         }
+        //private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        //{
+        //    using (var hmac = new HMACSHA512())
+        //    {
+        //        passwordSalt = hmac.Key;
+        //        passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+        //    }
+        //}
 
         public async Task Delete(string id)
         {

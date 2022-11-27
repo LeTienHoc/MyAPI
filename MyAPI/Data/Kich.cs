@@ -9,7 +9,6 @@ namespace MyAPI.Data
         public string? MaNhaKich { get; set; }
         public string? TenKich { get; set; }
         public string? MoTa { get; set; }
-        public string? DienVien { get; set; }
         public string? DaoDien { get; set; }
         public string? Image { get; set; }
         public DateTime? NgayBd { get; set; }

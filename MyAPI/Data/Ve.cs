@@ -10,8 +10,8 @@ namespace MyAPI.Data
         public string? MaKh { get; set; }
         public string? MaTk { get; set; }
         public string? MaGhe { get; set; }
-        public int? SoLuong { get; set; }
         public float? TongGia { get; set; }
         public DateTime? NgayDatVe { get; set; }
+        public ulong? TinhTrang { get; set; }
     }
 }

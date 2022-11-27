@@ -31,6 +31,8 @@ namespace MyAPI.Data
         public virtual DbSet<Taikhoan> Taikhoans { get; set; } = null!;
         public virtual DbSet<Ve> Ves { get; set; } = null!;
         public virtual DbSet<Xuatchieu> Xuatchieus { get; set; } = null!;
+        public virtual DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
+        public virtual DbSet<Lichchieu_Khuyenmai> Lichchieu_Khuyenmais { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -101,9 +103,6 @@ namespace MyAPI.Data
 
                 entity.Property(e => e.Hang).HasMaxLength(1);
 
-                entity.Property(e => e.TenGhe).HasMaxLength(255);
-
-                entity.Property(e => e.TinhTrangGhe).HasColumnType("bit(1)");
             });
 
             modelBuilder.Entity<Khachhang>(entity =>
@@ -161,8 +160,6 @@ namespace MyAPI.Data
 
                 entity.Property(e => e.DaoDien).HasMaxLength(255);
 
-                entity.Property(e => e.DienVien).HasMaxLength(255);
-
                 entity.Property(e => e.Image).HasMaxLength(255);
 
                 entity.Property(e => e.MoTa).HasMaxLength(255);
@@ -183,6 +180,12 @@ namespace MyAPI.Data
                 entity.HasNoKey();
 
                 entity.ToTable("kich_dienvien");
+            });
+            modelBuilder.Entity<Lichchieu_Khuyenmai>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("lichchieu_khuyenmai");
             });
 
             modelBuilder.Entity<Lichchieu>(entity =>
@@ -239,6 +242,15 @@ namespace MyAPI.Data
                 entity.ToTable("ve");
 
                 entity.Property(e => e.MaXc).HasColumnName("MaXC");
+            });
+            modelBuilder.Entity<RefreshToken>(entity =>
+            {
+                entity.HasKey(e => e.TokenID)
+                    .HasName("PRIMARY");
+
+                entity.ToTable("refreshtoken");
+
+                entity.Property(e => e.MaTk).HasColumnName("MaTK");
             });
 
             modelBuilder.Entity<Xuatchieu>(entity =>

@@ -37,34 +37,14 @@ namespace MyAPI.Repositories
         public async Task<string> Add(KhachhangModel Khachhang)
         {
             var newKhachhang = _mapper.Map<Khachhang>(Khachhang);
-            //string ma = "";
-            //var select = await _context.Khachhangs.ToListAsync();
-            //int count = select.Count();
-            //if (count <= 0)
-            //{
-            //    ma = "DD001";
-            //}
-            //else
-            //{
-            //    int k;
-            //    ma = "DD";
-            //    int h;
-            //    h = count - 1;
-            //    k = Convert.ToInt32((h).ToString().Substring(2, 3));
-            //    k = k + 1;
-            //    if (k < 10)
-            //    {
-            //        ma = ma + "00";
-            //    }
-            //    else if (k < 100)
-            //    {
-            //        ma = ma + "0";
-            //    }
-            //    ma = ma + k.ToString();
-            //}
+            
             newKhachhang.MaKh = ma();
-            _context.Khachhangs!.Add(newKhachhang);
-            await _context.SaveChangesAsync();
+            if(newKhachhang.MatKhau == newKhachhang.ConfirmMatKhau)
+            {
+                _context.Khachhangs!.Add(newKhachhang);
+                await _context.SaveChangesAsync();
+            }    
+            
 
             return newKhachhang.MaKh;
         }

@@ -5,6 +5,7 @@ using MyAPI.Repositories;
 
 namespace MyAPI.Controllers
 {
+
     [Route("api/[controller]")]
     [ApiController]
     public class VesController : ControllerBase

@@ -1,10 +1,14 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyAPI.Models;
 using MyAPI.Repositories;
+using System.Data;
+using System.Security.Cryptography;
 
 namespace MyAPI.Controllers
 {
+    [Authorize(Roles = "admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class TaikhoansController : ControllerBase
@@ -36,7 +40,7 @@ namespace MyAPI.Controllers
             return  Taikhoan==null ?NotFound():Ok(Taikhoan);
         }
 
-        [HttpPost]
+        [HttpPost("SignUp")]
         public async Task<IActionResult> AddNewTaikhoan(TaikhoanModel model)
         {
             try
@@ -51,6 +55,7 @@ namespace MyAPI.Controllers
             }
             
         }
+        
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTaikhoan(string id,TaikhoanModel model)

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyAPI.Data;
 
@@ -10,9 +11,10 @@ using MyAPI.Data;
 namespace MyAPI.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221126144958_AddRefreshTokenandconfirm")]
+    partial class AddRefreshTokenandconfirm
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -108,6 +110,9 @@ namespace MyAPI.Migrations
                     b.Property<string>("MaGhe")
                         .HasColumnType("varchar(255)");
 
+                    b.Property<float?>("GiaGhe")
+                        .HasColumnType("float");
+
                     b.Property<string>("Hang")
                         .HasMaxLength(1)
                         .HasColumnType("varchar(1)");
@@ -117,6 +122,13 @@ namespace MyAPI.Migrations
 
                     b.Property<int?>("Seat")
                         .HasColumnType("int");
+
+                    b.Property<string>("TenGhe")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<ulong?>("TinhTrangGhe")
+                        .HasColumnType("bit(1)");
 
                     b.HasKey("MaGhe")
                         .HasName("PRIMARY");
@@ -185,7 +197,7 @@ namespace MyAPI.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
-                    b.Property<string>("MaNhaKich")
+                    b.Property<string>("MaKich")
                         .HasColumnType("longtext");
 
                     b.Property<DateTime?>("NgayBd")
@@ -212,6 +224,10 @@ namespace MyAPI.Migrations
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("DaoDien")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("DienVien")
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
@@ -267,17 +283,11 @@ namespace MyAPI.Migrations
                     b.Property<string>("MaLichChieu")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<string>("MaNhaKich")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<DateTime?>("NgayBd")
-                        .IsRequired()
                         .HasColumnType("datetime(6)")
                         .HasColumnName("NgayBD");
 
                     b.Property<DateTime?>("NgayKt")
-                        .IsRequired()
                         .HasColumnType("datetime(6)")
                         .HasColumnName("NgayKT");
 
@@ -285,19 +295,6 @@ namespace MyAPI.Migrations
                         .HasName("PRIMARY");
 
                     b.ToTable("lichchieu", (string)null);
-                });
-
-            modelBuilder.Entity("MyAPI.Data.Lichchieu_Khuyenmai", b =>
-                {
-                    b.Property<string>("MaKM")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("MaLichChieu")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.ToTable("lichchieu_khuyenmai", (string)null);
                 });
 
             modelBuilder.Entity("MyAPI.Data.Nhakich", b =>
@@ -416,8 +413,8 @@ namespace MyAPI.Migrations
                     b.Property<DateTime?>("NgayDatVe")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<ulong?>("TinhTrang")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<int?>("SoLuong")
+                        .HasColumnType("int");
 
                     b.Property<float?>("TongGia")
                         .HasColumnType("float");
