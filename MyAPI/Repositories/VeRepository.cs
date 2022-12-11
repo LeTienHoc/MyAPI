@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.IdentityModel.Tokens;
 using MyAPI.Data;
 using MyAPI.Models;
+using System.Security.Claims;
 
 namespace MyAPI.Repositories
 {
@@ -34,37 +37,50 @@ namespace MyAPI.Repositories
                 return "V0" + result;
             else return "V" + result;
         }
+        public string findkh()
+        {
+
+            //return int.Parse(this._context.Taikhoans.Claims.First(i => i.Type == "UserId").Value);
+
+            string loi = "";
+            //var khach = _context.Khachhangs.Where(o => o.MaKh == kh);
+            //if(khach.Any())
+            //{
+            //    var khachhang = _context.Khachhangs.FindAsync(kh).Result.MaKh;
+            //    return khachhang;
+            //}
+            return loi;
+
+
+
+        }
+        public string findxc(string xc)
+        {
+            var xuatchieu = _context.Xuatchieus.FindAsync(xc).Result!.MaXc;
+            return xuatchieu;
+        }
+        public string findghe(string g)
+        {
+            var ghe = _context.Ghes.FindAsync(g).Result!.MaGhe;
+            return ghe;
+        }
         public async Task<string> Add(VeModel Ve)
         {
+            
+
             var newVe = _mapper.Map<Ve>(Ve);
-            //string ma = "";
-            //var select = await _context.Ves.ToListAsync();
-            //int count = select.Count();
-            //if (count <= 0)
+            //if (findkh(Ve.MaKh) == "")
             //{
-            //    ma = "DD001";
-            //}
-            //else
-            //{
-            //    int k;
-            //    ma = "DD";
-            //    int h;
-            //    h = count - 1;
-            //    k = Convert.ToInt32((h).ToString().Substring(2, 3));
-            //    k = k + 1;
-            //    if (k < 10)
-            //    {
-            //        ma = ma + "00";
-            //    }
-            //    else if (k < 100)
-            //    {
-            //        ma = ma + "0";
-            //    }
-            //    ma = ma + k.ToString();
+            //    return null;
             //}
             newVe.MaVe = ma();
+            newVe.MaXc = findxc(Ve.MaXc);
+            newVe.MaGhe = findghe(Ve.MaGhe);
+
+
             _context.Ves!.Add(newVe);
             await _context.SaveChangesAsync();
+
 
             return newVe.MaVe;
         }

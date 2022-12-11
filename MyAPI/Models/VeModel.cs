@@ -6,10 +6,9 @@ namespace MyAPI.Models
     {
         public string MaVe { get; set; }
         [Required]
-        public string? MaXc { get; set; }
-        [Required]
-        public string? MaKh { get; set; }
-        [Required]
+        public string? MaXc { get; set; } 
+        public string? MaKh { get; set; } 
+
         public string? MaTk { get; set; }
         [Required]
         public string? MaGhe { get; set; }

@@ -37,31 +37,7 @@ namespace MyAPI.Repositories
         public async Task<string> Add(DaodienModel daodien)
         {
             var newDaodien = _mapper.Map<Daodien>(daodien);
-            //string ma = "";
-            //var select = await _context.Daodiens.ToListAsync();
-            //int count = select.Count();
-            //if (count <= 0)
-            //{
-            //    ma = "DD001";
-            //}
-            //else
-            //{
-            //    int k;
-            //    ma = "DD";
-            //    int h;
-            //    h = count - 1;
-            //    k = Convert.ToInt32((h).ToString().Substring(2, 3));
-            //    k = k + 1;
-            //    if (k < 10)
-            //    {
-            //        ma = ma + "00";
-            //    }
-            //    else if (k < 100)
-            //    {
-            //        ma = ma + "0";
-            //    }
-            //    ma = ma + k.ToString();
-            //}
+           
             newDaodien.MaDaoDien = ma();
             _context.Daodiens!.Add(newDaodien);
             await _context.SaveChangesAsync();

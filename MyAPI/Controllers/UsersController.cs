@@ -50,14 +50,7 @@ namespace MyAPI.Controllers
                 Data = token
             });
         }
-        private void CreatePasswordHash(string password,out byte[] passwordHash,out byte[] passwordSalt)
-        {
-            using(var hmac = new HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-            }
-        }
+        
 
         private async Task<TokenModel> GenerateToken(Taikhoan taikhoan)
         {
@@ -69,12 +62,12 @@ namespace MyAPI.Controllers
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim("Tên tài khoản:",taikhoan.TenTaiKhoan),
-                    new Claim(JwtRegisteredClaimNames.Email,taikhoan.Email),
-                    new Claim(JwtRegisteredClaimNames.Sub,taikhoan.Email),
+                    new Claim(ClaimTypes.NameIdentifier,taikhoan.TenTaiKhoan!),
+                    new Claim(JwtRegisteredClaimNames.Email,taikhoan.Email!),
+                    new Claim(JwtRegisteredClaimNames.Sub,taikhoan.Email!),
                     new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
-                    new Claim("ID",taikhoan.MaTk),
-                    new Claim(ClaimTypes.Role,taikhoan.LoaiTaiKhoan),
+                    new Claim("UserID",taikhoan.MaTk),
+                    new Claim(ClaimTypes.Role,taikhoan.LoaiTaiKhoan!),
 
                     //roles
 

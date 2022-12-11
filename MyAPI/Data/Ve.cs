@@ -8,10 +8,8 @@ namespace MyAPI.Data
     {
         public string MaVe { get; set; }
         [Required]
-        public string? MaXc { get; set; }
-        [Required]
-        public string? MaKh { get; set; }
-        [Required]
+        public string? MaXc { get; set; } 
+        public string? MaKh { get; set; } 
         public string? MaTk { get; set; }
         [Required]
         public string? MaGhe { get; set; }
@@ -20,6 +18,6 @@ namespace MyAPI.Data
         [Required]
         public DateTime? NgayDatVe { get; set; }
         [Required]
-        public ulong? TinhTrang { get; set; }
+        public int TinhTrang { get; set; }
     }
 }

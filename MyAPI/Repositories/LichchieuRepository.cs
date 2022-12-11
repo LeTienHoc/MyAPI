@@ -39,16 +39,16 @@ namespace MyAPI.Repositories
         {
             var newLichchieu = _mapper.Map<Lichchieu>(Lichchieu);
 
-            if(newLichchieu.NgayBd<newLichchieu.NgayKt)
-            {
+ //           if(newLichchieu.NgayBd<newLichchieu.NgayKt)
+  //          {
                 newLichchieu.MaLichChieu = ma();
                 _context.Lichchieus!.Add(newLichchieu);
                 await _context.SaveChangesAsync();
-            }
-            else
-            {
-                return null;
-            }    
+  //          }
+//            else
+//            {
+  //              return null;
+ //           }    
             
 
 
