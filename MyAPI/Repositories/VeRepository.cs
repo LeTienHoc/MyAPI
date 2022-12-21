@@ -59,10 +59,15 @@ namespace MyAPI.Repositories
             var xuatchieu = _context.Xuatchieus.FindAsync(xc).Result!.MaXc;
             return xuatchieu;
         }
-        public string findghe(string g)
+        public string findghe(string g,int sl)
         {
-            var ghe = _context.Ghes.FindAsync(g).Result!.MaGhe;
-            return ghe;
+            for (int i=1;i<=sl;i++)
+            {
+                var ghe = _context.Ghes.FindAsync(g).Result!.MaGhe;
+                return ghe;
+            }    
+            return g;
+            
         }
         public async Task<string> Add(VeModel Ve)
         {
@@ -75,7 +80,7 @@ namespace MyAPI.Repositories
             //}
             newVe.MaVe = ma();
             newVe.MaXc = findxc(Ve.MaXc);
-            newVe.MaGhe = findghe(Ve.MaGhe);
+            newVe.MaGhe = findghe(Ve.MaGhe,3);
 
 
             _context.Ves!.Add(newVe);

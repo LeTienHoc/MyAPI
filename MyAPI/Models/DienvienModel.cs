@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MyAPI.Data;
+using System.ComponentModel.DataAnnotations;
 
 namespace MyAPI.Models
 {
@@ -10,5 +11,6 @@ namespace MyAPI.Models
         public string? MaNhaKich { get; set; }
         [Required]
         public string? TenDienVien { get; set; }
+      //  public KichDienvien Kich_dienvien { get; set; }
     }
 }

@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MyAPI.Data;
 using MyAPI.Models;
 using MyAPI.Repositories;
+using System.Security.Claims;
 
 namespace MyAPI.Controllers
 {
@@ -12,10 +15,12 @@ namespace MyAPI.Controllers
     public class DienviensController : ControllerBase
     {
         private readonly IDienvienRepository _DienvienRepo;
+        private readonly MyDbContext _context;
 
-        public DienviensController(IDienvienRepository repo)
+        public DienviensController(IDienvienRepository repo,MyDbContext context)
         {
             _DienvienRepo = repo;
+            _context = context;
         }
 
         [HttpGet]
@@ -44,6 +49,13 @@ namespace MyAPI.Controllers
         {
             try
             {
+                string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+                var mank = (from nk in _context.Nhakiches
+                            where nk.TenNhaKich == idtaikhoan
+                            select nk.MaNhaKich).SingleOrDefault().ToString();
+
+               
+                model.MaNhaKich = mank;
                 var newDienvienId = await _DienvienRepo.Add(model);
                 var Dienvien = await _DienvienRepo.GetByID(newDienvienId);
                 return Dienvien == null ? NotFound() : Ok(Dienvien);

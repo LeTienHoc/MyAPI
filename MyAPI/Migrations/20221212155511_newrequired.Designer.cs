@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyAPI.Data;
 
@@ -10,9 +11,10 @@ using MyAPI.Data;
 namespace MyAPI.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221212155511_newrequired")]
+    partial class newrequired
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,6 +41,32 @@ namespace MyAPI.Migrations
                         .HasName("PRIMARY");
 
                     b.ToTable("banner", (string)null);
+                });
+
+            modelBuilder.Entity("MyAPI.Data.Binhluan", b =>
+                {
+                    b.Property<string>("MaBl")
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("MaBL");
+
+                    b.Property<string>("MaKh")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("MaKich")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("NoiDung")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("TenTaiKhoan")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("MaBl")
+                        .HasName("PRIMARY");
+
+                    b.ToTable("binhluan", (string)null);
                 });
 
             modelBuilder.Entity("MyAPI.Data.Daodien", b =>
@@ -163,6 +191,44 @@ namespace MyAPI.Migrations
                     b.ToTable("khachhang", (string)null);
                 });
 
+            modelBuilder.Entity("MyAPI.Data.Khuyenmai", b =>
+                {
+                    b.Property<string>("MaKm")
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("MaKM");
+
+                    b.Property<string>("ChuDe")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Image")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("MaNhaKich")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("NgayBd")
+                        .IsRequired()
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("NgayBD");
+
+                    b.Property<DateTime?>("NgayKt")
+                        .IsRequired()
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("NgayKT");
+
+                    b.Property<string>("NoiDung")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("MaKm")
+                        .HasName("PRIMARY");
+
+                    b.ToTable("khuyenmai", (string)null);
+                });
+
             modelBuilder.Entity("MyAPI.Data.Kich", b =>
                 {
                     b.Property<string>("MaKich")
@@ -211,13 +277,12 @@ namespace MyAPI.Migrations
             modelBuilder.Entity("MyAPI.Data.KichDienvien", b =>
                 {
                     b.Property<string>("MaDienVien")
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("MaKich")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.HasKey("MaDienVien")
-                        .HasName("PRIMARY");
+                    b.Property<string>("MaKich")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.ToTable("kich_dienvien", (string)null);
                 });
@@ -245,6 +310,19 @@ namespace MyAPI.Migrations
                         .HasName("PRIMARY");
 
                     b.ToTable("lichchieu", (string)null);
+                });
+
+            modelBuilder.Entity("MyAPI.Data.Lichchieu_Khuyenmai", b =>
+                {
+                    b.Property<string>("MaKM")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("MaLichChieu")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.ToTable("lichchieu_khuyenmai", (string)null);
                 });
 
             modelBuilder.Entity("MyAPI.Data.Nhakich", b =>
@@ -405,9 +483,6 @@ namespace MyAPI.Migrations
                     b.Property<DateTime?>("NgayGio")
                         .IsRequired()
                         .HasColumnType("datetime(6)");
-
-                    b.Property<TimeSpan?>("Thoiluong")
-                        .HasColumnType("time(6)");
 
                     b.HasKey("MaXc")
                         .HasName("PRIMARY");

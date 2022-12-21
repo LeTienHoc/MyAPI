@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MyAPI.Data;
 using MyAPI.Models;
 using MyAPI.Repositories;
 using System.Data;
@@ -13,10 +14,12 @@ namespace MyAPI.Controllers
     public class NhakichsController : ControllerBase
     {
         private readonly INhakichRepository _NhakichRepo;
+        private readonly MyDbContext _context;
 
-        public NhakichsController(INhakichRepository repo)
+        public NhakichsController(INhakichRepository repo,MyDbContext context)
         {
             _NhakichRepo = repo;
+            _context = context;
         }
 
         [HttpGet]
@@ -44,6 +47,10 @@ namespace MyAPI.Controllers
         {
             try
             {
+                
+                
+                
+                
                 var newNhakichId = await _NhakichRepo.Add(model);
                 var Nhakich = await _NhakichRepo.GetByID(newNhakichId);
                 return Nhakich == null ? NotFound() : Ok(Nhakich);

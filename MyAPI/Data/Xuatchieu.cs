@@ -13,5 +13,7 @@ namespace MyAPI.Data
         public string? MaLichChieu { get; set; }
         [Required]
         public DateTime? NgayGio { get; set; }
+        public TimeSpan? Thoiluong { get; set; }
+
     }
 }

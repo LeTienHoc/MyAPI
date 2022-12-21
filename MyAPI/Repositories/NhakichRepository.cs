@@ -37,31 +37,7 @@ namespace MyAPI.Repositories
         public async Task<string> Add(NhakichModel Nhakich)
         {
             var newNhakich = _mapper.Map<Nhakich>(Nhakich);
-            //string ma = "";
-            //var select = await _context.Nhakichs.ToListAsync();
-            //int count = select.Count();
-            //if (count <= 0)
-            //{
-            //    ma = "DD001";
-            //}
-            //else
-            //{
-            //    int k;
-            //    ma = "DD";
-            //    int h;
-            //    h = count - 1;
-            //    k = Convert.ToInt32((h).ToString().Substring(2, 3));
-            //    k = k + 1;
-            //    if (k < 10)
-            //    {
-            //        ma = ma + "00";
-            //    }
-            //    else if (k < 100)
-            //    {
-            //        ma = ma + "0";
-            //    }
-            //    ma = ma + k.ToString();
-            //}
+            
             newNhakich.MaNhaKich = ma();
             _context.Nhakiches!.Add(newNhakich);
             await _context.SaveChangesAsync();

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyAPI.Data;
 
@@ -10,9 +11,10 @@ using MyAPI.Data;
 namespace MyAPI.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221219153217_xuatchieu")]
+    partial class xuatchieu
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -394,6 +396,9 @@ namespace MyAPI.Migrations
                         .HasColumnType("varchar(255)")
                         .HasColumnName("MaXC");
 
+                    b.Property<DateTime?>("KetThuc")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("MaKich")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -405,9 +410,6 @@ namespace MyAPI.Migrations
                     b.Property<DateTime?>("NgayGio")
                         .IsRequired()
                         .HasColumnType("datetime(6)");
-
-                    b.Property<TimeSpan?>("Thoiluong")
-                        .HasColumnType("time(6)");
 
                     b.HasKey("MaXc")
                         .HasName("PRIMARY");

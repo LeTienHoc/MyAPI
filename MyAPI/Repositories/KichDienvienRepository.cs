@@ -18,35 +18,20 @@ namespace MyAPI.Repositories
         public async Task<string> Add(KichDienvienModel KichDienvien)
         {
             var newKichDienvien = _mapper.Map<KichDienvien>(KichDienvien);
-            //string ma = "";
-            //var select = await _context.KichDienviens.ToListAsync();
-            //int count = select.Count();
-            //if (count <= 0)
-            //{
-            //    ma = "DD001";
-            //}
-            //else
-            //{
-            //    int k;
-            //    ma = "DD";
-            //    int h;
-            //    h = count - 1;
-            //    k = Convert.ToInt32((h).ToString().Substring(2, 3));
-            //    k = k + 1;
-            //    if (k < 10)
-            //    {
-            //        ma = ma + "00";
-            //    }
-            //    else if (k < 100)
-            //    {
-            //        ma = ma + "0";
-            //    }
-            //    ma = ma + k.ToString();
-            //}
-            //newKichDienvien.MaKichDienvien = ma;
-            _context.KichDienviens!.Add(newKichDienvien);
-            await _context.SaveChangesAsync();
-
+            var dvkich = (from k in _context.Kiches
+                          join v in _context.Dienviens on k.MaNhaKich equals v.MaNhaKich
+                          join nk in _context.Nhakiches on k.MaNhaKich equals nk.MaNhaKich
+                          where v.MaDienVien == KichDienvien.MaDienVien && k.MaKich==KichDienvien.MaKich
+                          select k.MaKich).SingleOrDefault()?.ToString();
+            if (dvkich == KichDienvien.MaKich)
+            {
+                _context.KichDienviens!.Add(newKichDienvien);
+                await _context.SaveChangesAsync();
+        }
+            else
+            {
+                return null;
+            }    
             return newKichDienvien.MaDienVien;
         }
 

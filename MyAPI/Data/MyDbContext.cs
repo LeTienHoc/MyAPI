@@ -18,12 +18,10 @@ namespace MyAPI.Data
         }
 
         public virtual DbSet<Banner> Banners { get; set; } = null!;
-        public virtual DbSet<Binhluan> Binhluans { get; set; } = null!;
         public virtual DbSet<Daodien> Daodiens { get; set; } = null!;
         public virtual DbSet<Dienvien> Dienviens { get; set; } = null!;
         public virtual DbSet<Ghe> Ghes { get; set; } = null!;
         public virtual DbSet<Khachhang> Khachhangs { get; set; } = null!;
-        public virtual DbSet<Khuyenmai> Khuyenmais { get; set; } = null!;
         public virtual DbSet<Kich> Kiches { get; set; } = null!;
         public virtual DbSet<KichDienvien> KichDienviens { get; set; } = null!;
         public virtual DbSet<Lichchieu> Lichchieus { get; set; } = null!;
@@ -32,7 +30,6 @@ namespace MyAPI.Data
         public virtual DbSet<Ve> Ves { get; set; } = null!;
         public virtual DbSet<Xuatchieu> Xuatchieus { get; set; } = null!;
         public virtual DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
-        public virtual DbSet<Lichchieu_Khuyenmai> Lichchieu_Khuyenmais { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -60,19 +57,7 @@ namespace MyAPI.Data
                 entity.Property(e => e.TenBanner).HasMaxLength(255);
             });
 
-            modelBuilder.Entity<Binhluan>(entity =>
-            {
-                entity.HasKey(e => e.MaBl)
-                    .HasName("PRIMARY");
-
-                entity.ToTable("binhluan");
-
-                entity.Property(e => e.MaBl).HasColumnName("MaBL");
-
-                entity.Property(e => e.NoiDung).HasMaxLength(255);
-
-                entity.Property(e => e.TenTaiKhoan).HasMaxLength(255);
-            });
+           
 
             modelBuilder.Entity<Daodien>(entity =>
             {
@@ -131,25 +116,7 @@ namespace MyAPI.Data
                 entity.Property(e => e.TenTaiKhoan).HasMaxLength(255);
             });
 
-            modelBuilder.Entity<Khuyenmai>(entity =>
-            {
-                entity.HasKey(e => e.MaKm)
-                    .HasName("PRIMARY");
-
-                entity.ToTable("khuyenmai");
-
-                entity.Property(e => e.MaKm).HasColumnName("MaKM");
-
-                entity.Property(e => e.ChuDe).HasMaxLength(255);
-
-                entity.Property(e => e.Image).HasMaxLength(255);
-
-                entity.Property(e => e.NgayBd).HasColumnName("NgayBD");
-
-                entity.Property(e => e.NgayKt).HasColumnName("NgayKT");
-
-                entity.Property(e => e.NoiDung).HasMaxLength(255);
-            });
+            
 
             modelBuilder.Entity<Kich>(entity =>
             {
@@ -177,15 +144,10 @@ namespace MyAPI.Data
 
             modelBuilder.Entity<KichDienvien>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasKey(e=>e.MaKich).HasName("PRIMARY");
+                entity.HasKey(e => e.MaDienVien).HasName("PRIMARY");
 
                 entity.ToTable("kich_dienvien");
-            });
-            modelBuilder.Entity<Lichchieu_Khuyenmai>(entity =>
-            {
-                entity.HasNoKey();
-
-                entity.ToTable("lichchieu_khuyenmai");
             });
 
             modelBuilder.Entity<Lichchieu>(entity =>

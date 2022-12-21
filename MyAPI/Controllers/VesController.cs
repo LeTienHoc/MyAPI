@@ -57,18 +57,21 @@ namespace MyAPI.Controllers
         //[Authorize(Roles = "quantrinhakich")]
         public async Task<IActionResult> AddNewVe(VeModel model,int soluong)
         {
+            
             string id = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value!;
             string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
-            var select = await _context.Ghes.ToListAsync();
+            var select = from ghes in _context.Ghes
+                         where ghes.Status == 0
+                         select ghes.MaGhe;
             int count = select.Count();
-            if(soluong==null||soluong==0)
+            if (soluong == null || soluong == 0)
             {
                 return BadRequest(new ApiResponse
                 {
-                    Success=false,
-                    Message="Bạn chưa chọn số lượng ghế"
+                    Success = false,
+                    Message = "Bạn chưa chọn số lượng ghế"
                 });
-            }    
+            }
             else
             {
                 if (soluong > count)
@@ -82,11 +85,11 @@ namespace MyAPI.Controllers
                 else
                 {
                     //var Seats = new List<SeatBookingModel>();
-                    //for(int i=1;i<=soluong;i++)
+                    //for (int i = 1; i <= soluong; i++)
                     //{
 
-                    //}    
-                    
+                    //}
+
 
                     //var innerjoinQuery = from ghes in _context.Ghes
                     //                     join ves in _context.Ves on ghes.MaGhe equals ves.MaGhe
@@ -94,9 +97,9 @@ namespace MyAPI.Controllers
                     //                     select new { Hangs = ghes.Hang, GSeats = ghes.Seat, Status = ves.TinhTrang };
                 }
             }
-            
-            
-            
+
+
+
             if (id!=null || idtaikhoan!=null)
             {
                 model.MaKh = id;

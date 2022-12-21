@@ -1,4 +1,6 @@
-﻿using MyAPI.Models;
+﻿using Microsoft.AspNetCore.Http.Metadata;
+using Microsoft.AspNetCore.Mvc;
+using MyAPI.Models;
 
 namespace MyAPI.Repositories
 {
@@ -9,5 +11,7 @@ namespace MyAPI.Repositories
         public Task<string> Add(KichModel Kich);
         public Task Update(string id,KichModel Kich);
         public Task Delete(string id);
+        public List<KichPageModel> Getallkichs(string search);
+        public Task DuyetKich(string id,UpdateModel model);
     }
 }

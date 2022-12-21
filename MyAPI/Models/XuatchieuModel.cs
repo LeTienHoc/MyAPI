@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Security.Cryptography.X509Certificates;
 
 namespace MyAPI.Models
 {
@@ -11,5 +12,6 @@ namespace MyAPI.Models
         public string? MaLichChieu { get; set; }
         [Required]
         public DateTime? NgayGio { get; set; }
+        public TimeSpan? Thoiluong { get; set; }
     }
 }

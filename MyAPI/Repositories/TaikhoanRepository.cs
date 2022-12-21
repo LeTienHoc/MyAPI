@@ -38,9 +38,13 @@ namespace MyAPI.Repositories
         public async Task<string> Add(TaikhoanModel Taikhoan)
         {
             var newTaikhoan = _mapper.Map<Taikhoan>(Taikhoan);
-            newTaikhoan.MaTk = ma();
+            
+               
+                          
             if(newTaikhoan.MatKhau == newTaikhoan.ConfirmMatkhau)
             {
+
+                newTaikhoan.MaTk = ma();
                 _context.Taikhoans!.Add(newTaikhoan);
                 await _context.SaveChangesAsync();
             }
