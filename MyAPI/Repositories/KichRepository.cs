@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using MyAPI.Data;
 using MyAPI.Models;
 using MySqlConnector;
+using System.Collections.Immutable;
+using System.Data;
 using System.Drawing;
 using System.Linq;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
@@ -14,6 +16,7 @@ namespace MyAPI.Repositories
     {
         private readonly MyDbContext _context;
         private readonly IMapper _mapper;
+        public static int PAGE_SIZE { get; set; } = 5;
 
         public KichRepository(MyDbContext context,IMapper mapper)
         {
@@ -93,92 +96,74 @@ namespace MyAPI.Repositories
             }    
         }
 
-        public List<KichPageModel> Getallkichs(string search)
+        public List<KichPageModel> Getallkichs(string search,int page=1)
         {
 
             //var allKichs = _context.Kiches.AsQueryable();
             //#region Filter
             //if (!string.IsNullOrEmpty(search))
             //{
-            var alls = (from k in _context.Kiches
-                        join dv in _context.KichDienviens on k.MaKich equals dv.MaKich
-                        join v in _context.Dienviens on dv.MaDienVien equals v.MaDienVien
-                        where k.TenKich.Contains(search) && k.TrangThai == 1 //|| k.TheLoai.Contains(search) && k.TrangThai == 1
-                        //|| k.DaoDien.Contains(search) && k.TrangThai == 1 || v.TenDienVien.Contains(search) && k.TrangThai == 1
-                        select new
-                        {
+                var kichdienvien = (from k1 in _context.Kiches
+                                join dv1 in _context.KichDienviens on k1.MaKich equals dv1.MaKich
+                                join v1 in _context.Dienviens on dv1.MaDienVien equals v1.MaDienVien
+                                where k1.TrangThai==1
+                                select new
+                                {
+                                    k1.MaKich,
+                                    v1.TenDienVien,
+                                    k1.TenKich,
+                                    k1.TrangThai,
+                                    k1.MoTa,
+                                    k1.DaoDien,
+                                    k1.TheLoai,
+                                    k1.Image,
+                                    k1.NgayBd,
+                                    k1.NgayKt
+                                }).ToList();
+            var group = (from k in kichdienvien
+                         group k by k.MaKich into k2
+                         select
+                         new
+                         {
+                             k2.Key,
+                             MoTa = k2.Select(p => p.MoTa).FirstOrDefault(),
+                             DaoDien = k2.Select(p => p.DaoDien).FirstOrDefault(),
+                             TenKich = k2.Select(p => p.TenKich).FirstOrDefault(),
+                             TheLoai = k2.Select(p => p.TheLoai).FirstOrDefault(),
+                             Image = k2.Select(p => p.Image).FirstOrDefault(),
+                             NgayBd = k2.Select(p => p.NgayBd).FirstOrDefault(),
+                             NgayKt = k2.Select(p => p.NgayKt).FirstOrDefault(),
+                             DienVien = string.Join(',', k2.Select(p => p.TenDienVien).ToList()),
 
-                            MoTa = k.MoTa,
-                            DaoDien = k.DaoDien,
-                            Image = k.Image,
-                            TenKich = k.TenKich,
-                            TheLoai = k.TheLoai,
-                            NgayBd = k.NgayBd,
-                            NgayKt = k.NgayKt,
-                            DienVien = (from kdv in _context.KichDienviens
-                                        join dv in _context.Dienviens on kdv.MaDienVien equals dv.MaDienVien
-                                        where k.TenKich.Contains(search) && k.TrangThai == 1 && k.MaKich==
-                                        group k by k.MaKich into k1
-                                        select string.Join(',', k1.Select(p => p.MaKich))),
-                        }).ToList();
-
-
-            /////////////////////////////////////////////
-
-            //var all2s = (from k in _context.Kiches
-            //             join dv in _context.KichDienviens on k.MaKich equals dv.MaKich
-            //             join v in _context.Dienviens on dv.MaDienVien equals v.MaDienVien
-            //             where k.TenKich.Contains(search) && k.TrangThai == 1
-            //             group v by k into g
-            //             select new
-            //             {
-            //                 k = g.Key,
-            //                 MoTa = g.Key.MoTa,
-            //                 DaoDien = g.Key.DaoDien,
-            //                 TenKich = g.Key.TenKich,
-            //                 TheLoai = g.Key.TheLoai,
-            //                 Image = g.Key.Image,
-            //                 NgayBd = g.Key.NgayBd,
-            //                 NgayKt = g.Key.NgayKt,
-            //                 TenDienViens = g.Select(tdv => tdv.TenDienVien),
-
-
-            //             }).ToList().Select(x => new
-            //             {
-            //                 MoTa = x.MoTa,
-            //                 DaoDien= x.DaoDien,
-            //                 TenKich=x.TenKich,
-            //                 TheLoai= x.TheLoai,
-            //                 Image= x.Image,
-            //                 NgayBd= x.NgayBd,
-            //                 NgayKt= x.NgayKt,
-            //                 TenDienViens = string.Join(",", x.TenDienViens),
-            //             }).ToList();
-
-
-
-            //  var ketqua = string.Join(alls,all2s);
-            var result = alls.Select(k => new KichPageModel
-                {
-                    MoTa = k.MoTa,
-                    DaoDien = k.DaoDien,
-                    Image = k.Image,
-                    TenKich = k.TenKich,
-                    TheLoai = k.TheLoai,
-                    NgayBd = k.NgayBd,
-                    NgayKt = k.NgayKt,
-                //DienVien = k.TenDienViens,
+                         }).ToList()!.Select(x => new
+                         {
+                             MoTa = x.MoTa,
+                             DaoDien = x.DaoDien,
+                             TenKich = x.TenKich,
+                             TheLoai = x.TheLoai,
+                             Image = x.Image,
+                             NgayBd = x.NgayBd,
+                             NgayKt = x.NgayKt,
+                             DienVien = x.DienVien,
+                         });
+            #region Paging
+            group = group.Skip((page - 1) * PAGE_SIZE).Take(PAGE_SIZE);
+            #endregion
+            var result = group.Select(k => new KichPageModel
+            {
+                MoTa = k.MoTa,
+                DaoDien = k.DaoDien,
+                Image = k.Image,
+                TenKich = k.TenKich,
+                TheLoai = k.TheLoai,
+                NgayBd = k.NgayBd,
+                NgayKt = k.NgayKt,
+                DienVien = k.DienVien
             });
-                return result.ToList();
-            //allKichs = allKichs.Where(k => k.TenKich.Contains(search)||k.TheLoai.Contains(search)
-            //|| k.DaoDien.Contains(search));
-            // }
+            
+            return result.ToList();
 
-            //#endregion
-            //allKichs = allKichs.OrderBy(k => k.TenKich);
 
-            //#region Sorting
-            //#endregion
 
 
         }

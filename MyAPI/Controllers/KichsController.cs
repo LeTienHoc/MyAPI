@@ -91,7 +91,7 @@ namespace MyAPI.Controllers
         }
         [Route("Search")]
         [HttpGet]
-        public IActionResult GetallKichs(string search)
+        public IActionResult GetallKichs(string search,int page=1)
         { 
             try
             {
@@ -104,7 +104,7 @@ namespace MyAPI.Controllers
             }
             catch
             {
-                return BadRequest("không tìm thấy");
+                return BadRequest("Lỗi");
             }
         }
         
