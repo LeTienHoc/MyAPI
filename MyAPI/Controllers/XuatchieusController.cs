@@ -51,62 +51,60 @@ namespace MyAPI.Controllers
         {
             try
             {
-                //var kttimebd = from lc in _context.Lichchieus
-                //               select lc.NgayBd;
-                //var select = (from xc in _context.Xuatchieus
-                //              join lc in _context.Lichchieus on xc.MaLichChieu equals lc.MaLichChieu
-                //              where lc.NgayBd <= model.NgayGio && lc.NgayKt >= model.NgayGio
-                //              select xc.NgayGio).SingleOrDefault()?.Count();
-                //if(kttimebd)
-                //if(select>=1)
-                //{
                 string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
                 var mank = (from nk in _context.Nhakiches
                             where nk.TenNhaKich == idtaikhoan
                             select nk.MaNhaKich).SingleOrDefault()?.ToString();
-                var kich = (from k in _context.Kiches
-                            where k.MaNhaKich == "" + mank + "" && k.TrangThai == 1 && k.MaKich == model.MaKich
-                            select k.MaKich).ToList().Count();
                 
+                var select = (from lc in _context.Lichchieus
+                              where lc.NgayBd <= model.NgayGio && lc.NgayKt >= model.NgayGio && lc.MaNhaKich==""+mank+""
+                              select lc.MaLichChieu).ToList()?.Count();
                 
-                if (kich>0)
+                if (select >= 1)
                 {
+                    var kich = (from k in _context.Kiches
+                                where k.MaNhaKich == "" + mank + "" && k.TrangThai == 1 && k.MaKich == model.MaKich &&
+                                k.NgayBd<=model.NgayGio && k.NgayKt>=model.NgayGio
+                                select k.MaKich).ToList().Count();
+
+                    if (kich>0)
+                    {
                     var ktlich = (from lc in _context.Lichchieus
                                   where lc.MaNhaKich == "" + mank + "" && lc.NgayBd <= model.NgayGio && lc.NgayKt >= model.NgayGio
                                   select lc.MaLichChieu).SingleOrDefault()?.ToString();
-                    if (model.MaLichChieu==ktlich)
-                    {
+                        if (model.MaLichChieu==ktlich)
+                        {
                         
-                        var newXuatchieuId = await _XuatchieuRepo.Add(model);
-                        var Xuatchieu = await _XuatchieuRepo.GetByID(newXuatchieuId);
-                        return Xuatchieu == null ? NotFound() : Ok(Xuatchieu);
-                    }  
+                            var newXuatchieuId = await _XuatchieuRepo.Add(model);
+                            var Xuatchieu = await _XuatchieuRepo.GetByID(newXuatchieuId);
+                            return Xuatchieu == null ? NotFound() : Ok(Xuatchieu);
+                        }  
+                        else
+                        {
+                            return BadRequest(new ApiResponse
+                            {
+                                Success = false,
+                                Message = "Kịch không có lịch chiếu"
+                            });
+                        }    
+                    }   
                     else
                     {
                         return BadRequest(new ApiResponse
                         {
-                            Success = false,
-                            Message = "Không có lịch chiếu"
+                            Success=false,
+                            Message="Không có kịch"
                         });
-                    }    
-                    
-                }   
+                    }
+                }
                 else
                 {
                     return BadRequest(new ApiResponse
                     {
-                        Success=false,
-                        Message="Không có kịch"
+                        Success = false,
+                        Message = "Nhà kịch không có lịch chiếu kịch này"
                     });
-                }    
-
-                
-                //}    
-                //else
-                //{
-                //    return BadRequest();
-                //}    
-                
+                }
             }
             catch
             {

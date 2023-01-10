@@ -6,6 +6,7 @@ using MyAPI.Data;
 using MyAPI.Models;
 using MyAPI.Repositories;
 using System.Data;
+using System.Drawing.Printing;
 using System.Security.Claims;
 
 namespace MyAPI.Controllers
@@ -43,6 +44,7 @@ namespace MyAPI.Controllers
             var Kich= await _KichRepo.GetByID(id);
             return  Kich==null ?NotFound():Ok(Kich);
         }
+        
         [Authorize(Roles = "quantrinhakich")]
         [HttpPost]
         public async Task<IActionResult> AddNewKich(KichModel model)
@@ -107,6 +109,19 @@ namespace MyAPI.Controllers
                 return BadRequest("Lỗi");
             }
         }
-        
+        [Route("Detail")]
+        [HttpGet]
+        public IActionResult Detail(string id)
+        {
+            try
+            {
+                var result = _KichRepo.Detail(id);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
     }
 }

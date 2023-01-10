@@ -13,5 +13,7 @@ namespace MyAPI.Repositories
         public Task Delete(string id);
         public List<KichPageModel> Getallkichs(string search,int page=1);
         public Task DuyetKich(string id,UpdateModel model);
+        public List<KichPageModel> Detail(string id);
+        
     }
 }

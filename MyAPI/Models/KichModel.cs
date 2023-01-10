@@ -14,7 +14,6 @@ namespace MyAPI.Models
         
         public string? MoTa { get; set; }
         
-        public string? DaoDien { get; set; }
        
         public string? Image { get; set; }
         

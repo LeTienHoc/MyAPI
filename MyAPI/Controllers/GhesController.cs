@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MyAPI.Data;
 using MyAPI.Models;
 using MyAPI.Repositories;
 using System.Data;
+using System.Security.Claims;
 
 namespace MyAPI.Controllers
 {
@@ -13,10 +16,12 @@ namespace MyAPI.Controllers
     public class GhesController : ControllerBase
     {
         private readonly IGheRepository _GheRepo;
+        private readonly MyDbContext _context;
 
-        public GhesController(IGheRepository repo)
+        public GhesController(IGheRepository repo,MyDbContext context)
         {
             _GheRepo = repo;
+            _context = context;
         }
 
         [HttpGet]
@@ -38,12 +43,17 @@ namespace MyAPI.Controllers
             var Ghe= await _GheRepo.GetByID(id);
             return  Ghe==null ?NotFound():Ok(Ghe);
         }
-        
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddNewGhe(GheModel model)
         {
             try
             {
+                string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+                var mank = (from nk in _context.Nhakiches
+                            where nk.TenNhaKich == idtaikhoan
+                            select nk.MaNhaKich).SingleOrDefault().ToString();
+                model.NhaKich = mank;
                 var newGheId = await _GheRepo.Add(model);
                 var Ghe = await _GheRepo.GetByID(newGheId);
                 return Ghe == null ? NotFound() : Ok(Ghe);

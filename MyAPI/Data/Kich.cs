@@ -15,8 +15,6 @@ namespace MyAPI.Data
         
         public string? MoTa { get; set; }
         
-        public string? DaoDien { get; set; }
-        
         public string? Image { get; set; }
         
         public DateTime? NgayBd { get; set; }

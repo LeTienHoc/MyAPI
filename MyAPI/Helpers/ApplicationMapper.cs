@@ -18,6 +18,7 @@ namespace MyAPI.Helpers
             
             CreateMap<Kich, KichModel>().ReverseMap();
             CreateMap<KichDienvien, KichDienvienModel>().ReverseMap();
+            CreateMap<KichDaodien, KichDaodienModel>().ReverseMap();
             CreateMap<Lichchieu, LichchieuModel>().ReverseMap();
             CreateMap<Nhakich, NhakichModel>().ReverseMap();
             CreateMap<Taikhoan, TaikhoanModel>().ReverseMap();

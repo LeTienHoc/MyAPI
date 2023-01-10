@@ -24,6 +24,7 @@ namespace MyAPI.Data
         public virtual DbSet<Khachhang> Khachhangs { get; set; } = null!;
         public virtual DbSet<Kich> Kiches { get; set; } = null!;
         public virtual DbSet<KichDienvien> KichDienviens { get; set; } = null!;
+        public virtual DbSet<KichDaodien> KichDaodiens { get; set; } = null!;
         public virtual DbSet<Lichchieu> Lichchieus { get; set; } = null!;
         public virtual DbSet<Nhakich> Nhakiches { get; set; } = null!;
         public virtual DbSet<Taikhoan> Taikhoans { get; set; } = null!;
@@ -125,7 +126,6 @@ namespace MyAPI.Data
 
                 entity.ToTable("kich");
 
-                entity.Property(e => e.DaoDien).HasMaxLength(255);
 
                 entity.Property(e => e.Image).HasMaxLength(255);
 
@@ -148,6 +148,13 @@ namespace MyAPI.Data
                 entity.HasKey(e => e.MaDienVien).HasName("PRIMARY");
 
                 entity.ToTable("kich_dienvien");
+            });
+            modelBuilder.Entity<KichDaodien>(entity =>
+            {
+                entity.HasKey(e => e.MaKich).HasName("PRIMARY");
+                entity.HasKey(e => e.MaDaodien).HasName("PRIMARY");
+
+                entity.ToTable("kich_daodien");
             });
 
             modelBuilder.Entity<Lichchieu>(entity =>

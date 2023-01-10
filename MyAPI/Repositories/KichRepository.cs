@@ -95,18 +95,14 @@ namespace MyAPI.Repositories
                 }    
             }    
         }
-
-        public List<KichPageModel> Getallkichs(string search,int page=1)
+        public List<KichPageModel> Detail(string id)
         {
-
-            //var allKichs = _context.Kiches.AsQueryable();
-            //#region Filter
-            //if (!string.IsNullOrEmpty(search))
-            //{
-                var kichdienvien = (from k1 in _context.Kiches
+            var kichdienvien = (from k1 in _context.Kiches
                                 join dv1 in _context.KichDienviens on k1.MaKich equals dv1.MaKich
                                 join v1 in _context.Dienviens on dv1.MaDienVien equals v1.MaDienVien
-                                where k1.TrangThai==1
+                                join kd1 in _context.KichDaodiens on k1.MaKich equals kd1.MaKich
+                                join dd1 in _context.Daodiens on kd1.MaDaodien equals dd1.MaDaoDien
+                                where k1.MaKich==""+id+""
                                 select new
                                 {
                                     k1.MaKich,
@@ -114,7 +110,7 @@ namespace MyAPI.Repositories
                                     k1.TenKich,
                                     k1.TrangThai,
                                     k1.MoTa,
-                                    k1.DaoDien,
+                                    dd1.TenDaoDien,
                                     k1.TheLoai,
                                     k1.Image,
                                     k1.NgayBd,
@@ -127,13 +123,80 @@ namespace MyAPI.Repositories
                          {
                              k2.Key,
                              MoTa = k2.Select(p => p.MoTa).FirstOrDefault(),
-                             DaoDien = k2.Select(p => p.DaoDien).FirstOrDefault(),
+                             DaoDien = string.Join(',', k2.Select(p => p.TenDaoDien).ToList().Distinct()),
                              TenKich = k2.Select(p => p.TenKich).FirstOrDefault(),
                              TheLoai = k2.Select(p => p.TheLoai).FirstOrDefault(),
                              Image = k2.Select(p => p.Image).FirstOrDefault(),
                              NgayBd = k2.Select(p => p.NgayBd).FirstOrDefault(),
                              NgayKt = k2.Select(p => p.NgayKt).FirstOrDefault(),
-                             DienVien = string.Join(',', k2.Select(p => p.TenDienVien).ToList()),
+                             DienVien = string.Join(',', k2.Select(p => p.TenDienVien).ToList().Distinct()),
+
+                         }).ToList()!.Select(x => new
+                         {
+                             MoTa = x.MoTa,
+                             DaoDien = x.DaoDien,
+                             TenKich = x.TenKich,
+                             TheLoai = x.TheLoai,
+                             Image = x.Image,
+                             NgayBd = x.NgayBd,
+                             NgayKt = x.NgayKt,
+                             DienVien = x.DienVien,
+                         });
+            var result = group.Select(k => new KichPageModel
+            {
+                MoTa = k.MoTa,
+                DaoDien = k.DaoDien,
+                Image = k.Image,
+                TenKich = k.TenKich,
+                TheLoai = k.TheLoai,
+                NgayBd = k.NgayBd,
+                NgayKt = k.NgayKt,
+                DienVien = k.DienVien
+            });
+
+            return result.ToList();
+        }
+
+        public List<KichPageModel> Getallkichs(string search,int page=1)
+        {
+
+            //var allKichs = _context.Kiches.AsQueryable();
+            //#region Filter
+            //if (!string.IsNullOrEmpty(search))
+            //{
+                var kichdienvien = (from k1 in _context.Kiches
+                                join dv1 in _context.KichDienviens on k1.MaKich equals dv1.MaKich
+                                join v1 in _context.Dienviens on dv1.MaDienVien equals v1.MaDienVien
+                                join kd1 in _context.KichDaodiens on k1.MaKich equals kd1.MaKich
+                                join dd1 in _context.Daodiens on kd1.MaDaodien equals dd1.MaDaoDien
+                                where k1.TrangThai==1 && k1.TenKich.Contains(search)
+                                select new
+                                {
+                                    k1.MaKich,
+                                    v1.TenDienVien,
+                                    k1.TenKich,
+                                    k1.TrangThai,
+                                    k1.MoTa,
+                                    dd1.TenDaoDien,
+                                    k1.TheLoai,
+                                    k1.Image,
+                                    k1.NgayBd,
+                                    k1.NgayKt
+                                }).ToList();
+            var group = (from k in kichdienvien
+                         group k by k.MaKich into k2
+                         select
+                         new
+                         {
+                             k2.Key,
+                             MoTa = k2.Select(p => p.MoTa).FirstOrDefault(),
+                             DaoDien = string.Join(',',k2.Select(p=>p.TenDaoDien).ToList().Distinct()),
+                             TenKich = k2.Select(p => p.TenKich).FirstOrDefault(),
+                             TheLoai = k2.Select(p => p.TheLoai).FirstOrDefault(),
+                             Image = k2.Select(p => p.Image).FirstOrDefault(),
+                             NgayBd = k2.Select(p => p.NgayBd).FirstOrDefault(),
+                             NgayKt = k2.Select(p => p.NgayKt).FirstOrDefault(),
+                             DienVien = string.Join(',', k2.Select(p => p.TenDienVien).ToList().Distinct()),
 
                          }).ToList()!.Select(x => new
                          {

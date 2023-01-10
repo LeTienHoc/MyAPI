@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MyAPI.Data;
 using MyAPI.Models;
 using MyAPI.Repositories;
+using System.Security.Claims;
 
 namespace MyAPI.Controllers
 {
@@ -12,10 +15,12 @@ namespace MyAPI.Controllers
     public class DaodiensController : ControllerBase
     {
         private readonly IDaodienRepository _daodienRepo;
+        private readonly MyDbContext _context;
 
-        public DaodiensController(IDaodienRepository repo)
+        public DaodiensController(IDaodienRepository repo,MyDbContext context)
         {
             _daodienRepo = repo;
+            _context = context;
         }
 
         [HttpGet]
@@ -37,12 +42,19 @@ namespace MyAPI.Controllers
             var daodien= await _daodienRepo.GetByID(id);
             return  daodien==null ?NotFound():Ok(daodien);
         }
-
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddNewDaodien(DaodienModel model)
         {
             try
             {
+                string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+                var mank = (from nk in _context.Nhakiches
+                            where nk.TenNhaKich == idtaikhoan
+                            select nk.MaNhaKich).SingleOrDefault().ToString();
+
+
+                model.MaNhaKich = mank;
                 var newDaodienId = await _daodienRepo.Add(model);
                 var daodien = await _daodienRepo.GetByID(newDaodienId);
                 return daodien == null ? NotFound() : Ok(daodien);

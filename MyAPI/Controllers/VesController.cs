@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using MyAPI.Data;
 using MyAPI.Models;
 using MyAPI.Repositories;
+using System.Collections.Immutable;
 using System.Data;
 using System.Security.Claims;
+
 
 namespace MyAPI.Controllers
 {
@@ -61,7 +63,7 @@ namespace MyAPI.Controllers
             string id = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value!;
             string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
             var select = from ghes in _context.Ghes
-                         where ghes.Status == 0
+                         where ghes.Status == 0 && ghes.NhaKich== "NK000000002"
                          select ghes.MaGhe;
             int count = select.Count();
             if (soluong == null || soluong == 0)
@@ -84,17 +86,32 @@ namespace MyAPI.Controllers
                 }
                 else
                 {
-                    //var Seats = new List<SeatBookingModel>();
-                    //for (int i = 1; i <= soluong; i++)
-                    //{
-
-                    //}
-
-
-                    //var innerjoinQuery = from ghes in _context.Ghes
-                    //                     join ves in _context.Ves on ghes.MaGhe equals ves.MaGhe
-                    //                     where ves.TinhTrang == 0
-                    //                     select new { Hangs = ghes.Hang, GSeats = ghes.Seat, Status = ves.TinhTrang };
+                    var ghe = (from g in _context.Ghes
+                              where g.NhaKich== "NK000000002"
+                              select new 
+                              { 
+                                 g.MaGhe,
+                                 g.NhaKich,
+                                 g.Hang,
+                                 g.Seat,
+                                 g.Status
+                              }).ToList();
+                    var result = ghe.Select(g=>new GheModel
+                    {
+                        MaGhe=g.MaGhe,
+                        NhaKich=g.NhaKich,
+                        Hang=g.Hang,
+                        Seat=g.Seat,
+                        Status=g.Status
+                    }).ToList();
+                    
+                    List<GheModel> gheModels= new List<GheModel>();
+                    gheModels.AddRange(result);
+                    for(int i=0; i<soluong; i++)
+                    {
+                        
+                    }    
+ //                 
                 }
             }
 
