@@ -13,7 +13,6 @@ namespace MyAPI.Models
         public string? TenKich { get; set; }
         
         public string? MoTa { get; set; }
-        
        
         public string? Image { get; set; }
         

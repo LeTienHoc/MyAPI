@@ -98,17 +98,10 @@ namespace MyAPI.Data
 
                 entity.ToTable("khachhang");
 
-                entity.Property(e => e.Avarta).HasMaxLength(255);
-
-                entity.Property(e => e.DiaChi).HasMaxLength(255);
 
                 entity.Property(e => e.Email).HasMaxLength(255);
 
                 entity.Property(e => e.MatKhau).HasMaxLength(255);
-
-                entity.Property(e => e.Sdt)
-                    .HasMaxLength(10)
-                    .HasColumnName("SDT");
 
                 entity.Property(e => e.TenKh)
                     .HasMaxLength(255)
