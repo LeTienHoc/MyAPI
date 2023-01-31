@@ -73,7 +73,7 @@ namespace MyAPI.Repositories
 
         public async Task<List<KichModel>> GetAll()
         {
-            var Kichs = await _context.Kiches!.ToListAsync();
+            var Kichs = await _context.Kiches!/*.Where(t=>t.MaNhaKich!.Equals(""+manhakich+""))*/.ToListAsync();
             return _mapper.Map<List<KichModel>>(Kichs);
         }
 

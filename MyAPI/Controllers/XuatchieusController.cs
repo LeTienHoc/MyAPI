@@ -57,20 +57,20 @@ namespace MyAPI.Controllers
                             select nk.MaNhaKich).SingleOrDefault()?.ToString();
                 
                 var select = (from lc in _context.Lichchieus
-                              where lc.NgayBd <= model.NgayGio && lc.NgayKt >= model.NgayGio && lc.MaNhaKich==""+mank+""
+                              where lc.NgayBd <= model.NgayChieu && lc.NgayKt >= model.NgayChieu && lc.MaNhaKich==""+mank+""
                               select lc.MaLichChieu).ToList()?.Count();
                 
                 if (select >= 1)
                 {
                     var kich = (from k in _context.Kiches
                                 where k.MaNhaKich == "" + mank + "" && k.TrangThai == 1 && k.MaKich == model.MaKich &&
-                                k.NgayBd<=model.NgayGio && k.NgayKt>=model.NgayGio
+                                k.NgayBd<=model.NgayChieu && k.NgayKt>=model.NgayChieu
                                 select k.MaKich).ToList().Count();
 
                     if (kich>0)
                     {
                     var ktlich = (from lc in _context.Lichchieus
-                                  where lc.MaNhaKich == "" + mank + "" && lc.NgayBd <= model.NgayGio && lc.NgayKt >= model.NgayGio
+                                  where lc.MaNhaKich == "" + mank + "" && lc.NgayBd <= model.NgayChieu && lc.NgayKt >= model.NgayChieu
                                   select lc.MaLichChieu).SingleOrDefault()?.ToString();
                         if (model.MaLichChieu==ktlich)
                         {
@@ -112,12 +112,63 @@ namespace MyAPI.Controllers
             }
             
         }
-
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateXuatchieu(string id,XuatchieuModel model)
         {
-            await _XuatchieuRepo.Update(id, model);
-            return Ok();
+            string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+            var mank = (from nk in _context.Nhakiches
+                        where nk.TenNhaKich == idtaikhoan
+                        select nk.MaNhaKich).SingleOrDefault()?.ToString();
+
+            var select = (from lc in _context.Lichchieus
+                          where lc.NgayBd <= model.NgayChieu && lc.NgayKt >= model.NgayChieu && lc.MaNhaKich == "" + mank + ""
+                          select lc.MaLichChieu).ToList()?.Count();
+
+            if (select >= 1)
+            {
+                var kich = (from k in _context.Kiches
+                            where k.MaNhaKich == "" + mank + "" && k.TrangThai == 1 && k.MaKich == model.MaKich &&
+                            k.NgayBd <= model.NgayChieu && k.NgayKt >= model.NgayChieu
+                            select k.MaKich).ToList().Count();
+
+                if (kich > 0)
+                {
+                    var ktlich = (from lc in _context.Lichchieus
+                                  where lc.MaNhaKich == "" + mank + "" && lc.NgayBd <= model.NgayChieu && lc.NgayKt >= model.NgayChieu
+                                  select lc.MaLichChieu).SingleOrDefault()?.ToString();
+                    if (model.MaLichChieu == ktlich)
+                    {
+
+                        await _XuatchieuRepo.Update(id, model);
+                        return Ok();
+                    }
+                    else
+                    {
+                        return BadRequest(new ApiResponse
+                        {
+                            Success = false,
+                            Message = "Kịch không có lịch chiếu"
+                        });
+                    }
+                }
+                else
+                {
+                    return BadRequest(new ApiResponse
+                    {
+                        Success = false,
+                        Message = "Không có kịch"
+                    });
+                }
+            }
+            else
+            {
+                return BadRequest(new ApiResponse
+                {
+                    Success = false,
+                    Message = "Nhà kịch không có lịch chiếu kịch này"
+                });
+            }
         }
 
         [HttpDelete("{id}")]
@@ -125,6 +176,7 @@ namespace MyAPI.Controllers
         {
             await _XuatchieuRepo.Delete(id);
             return Ok();
+            
         }
     }
 }

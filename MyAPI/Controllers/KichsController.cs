@@ -56,7 +56,7 @@ namespace MyAPI.Controllers
                 string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
                 var mank = (from nk in _context.Nhakiches
                             where nk.TenNhaKich == idtaikhoan
-                            select nk.MaNhaKich).SingleOrDefault()!.ToString();
+                            select nk.MaNhaKich).SingleOrDefault().ToString();
 
                // var mank1 = _context.Nhakiches.Select(x => x.TenNhaKich == idtaikhoan);
                 model.MaNhaKich = mank;  

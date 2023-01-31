@@ -95,12 +95,41 @@ namespace MyAPI.Controllers
             
         
         }
-
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateLichchieu(string id,LichchieuModel model)
         {
-            await _LichchieuRepo.Update(id, model);
-            return Ok();
+            string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+            var mank = (from nk in _context.Nhakiches
+                        where nk.TenNhaKich == idtaikhoan
+                        select nk.MaNhaKich).SingleOrDefault()!.ToString();
+            if (model.NgayBd < model.NgayKt)
+            {
+                var ktralc = (from lc in _context.Lichchieus
+                              where lc.NgayBd <= model.NgayBd && lc.NgayKt >= model.NgayBd && lc.MaNhaKich == "" + mank + ""
+                              select lc.MaLichChieu).ToList().Count();
+                if (ktralc == 0)
+                {
+                    await _LichchieuRepo.Update(id, model);
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest(new ApiResponse
+                    {
+                        Success = false,
+                        Message = "Lịch trùng , đã có lịch chiếu"
+                    });
+                }
+            }
+            else
+            {
+                return BadRequest(new ApiResponse
+                {
+                    Success = false,
+                    Message = "Ngày Bắt đầu phải trước ngày kết thúc"
+                });
+            }
         }
 
         [HttpDelete("{id}")]

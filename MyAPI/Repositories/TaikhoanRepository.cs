@@ -80,11 +80,15 @@ namespace MyAPI.Repositories
 
         public async Task Update(string id, TaikhoanModel Taikhoan)
         {
-            if(id == Taikhoan.MaTk)
+            var updateTaikhoan = _mapper.Map<Taikhoan>(Taikhoan);
+            if (id == Taikhoan.MaTk)
             {
-                var updateTaikhoan = _mapper.Map<Taikhoan>(Taikhoan);
-                _context.Taikhoans!.Update(updateTaikhoan);
-                await _context.SaveChangesAsync();
+                if (updateTaikhoan.MatKhau == updateTaikhoan.ConfirmMatkhau)
+                {
+
+                    _context.Taikhoans!.Update(updateTaikhoan);
+                    await _context.SaveChangesAsync();
+                }    
             }    
         }
 

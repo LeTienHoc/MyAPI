@@ -11,7 +11,7 @@ namespace MyAPI.Models
         [Required]
         public string? MaLichChieu { get; set; }
         [Required]
-        public DateTime? NgayGio { get; set; }
-        public string? Thoiluong { get; set; }
+        public DateTime? NgayChieu { get; set; }
+        public string? Thoigian { get; set; }
     }
 }

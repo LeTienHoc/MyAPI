@@ -48,9 +48,6 @@ namespace MyAPI.Controllers
             try
             {
                 
-                
-                
-                
                 var newNhakichId = await _NhakichRepo.Add(model);
                 var Nhakich = await _NhakichRepo.GetByID(newNhakichId);
                 return Nhakich == null ? NotFound() : Ok(Nhakich);

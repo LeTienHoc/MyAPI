@@ -73,8 +73,24 @@ namespace MyAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTaikhoan(string id,TaikhoanModel model)
         {
-            await _TaikhoanRepo.Update(id, model);
-            return Ok();
+            if(model.MatKhau==model.ConfirmMatkhau)
+            {
+                await _TaikhoanRepo.Update(id, model);
+                return Ok(new ApiResponse
+                {
+                    Success=true,
+                    Message="Update thành công"
+                });
+            }  
+            else
+            {
+                return BadRequest(new ApiResponse
+                {
+                    Success = false,
+                    Message = "Mật khẩu không khớp"
+                });
+            }    
+            
         }
 
         [HttpDelete("{id}")]
