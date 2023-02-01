@@ -12,10 +12,6 @@ namespace MyAPI.Models
         [Required]
         public string? ConfirmMatkhau { get; set; }
         [Required]
-        public string? Email { get; set; }
-        [Required]
-        public string? Sdt { get; set; }
-        [Required]
         public string? LoaiTaiKhoan { get; set; }
     }
 }

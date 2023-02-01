@@ -10,5 +10,6 @@ namespace MyAPI.Models
         public string? MaNhaKich { get; set; }
         [Required]
         public string? TenDaoDien { get; set; }
+
     }
 }

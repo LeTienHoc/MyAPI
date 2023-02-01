@@ -63,8 +63,6 @@ namespace MyAPI.Controllers
                 Subject = new ClaimsIdentity(new[]
                 {
                     new Claim(ClaimTypes.NameIdentifier,taikhoan.TenTaiKhoan!),
-                    new Claim(JwtRegisteredClaimNames.Email,taikhoan.Email!),
-                    new Claim(JwtRegisteredClaimNames.Sub,taikhoan.Email!),
                     new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
                     new Claim("UserID",taikhoan.MaTk),
                     new Claim(ClaimTypes.Role,taikhoan.LoaiTaiKhoan!),

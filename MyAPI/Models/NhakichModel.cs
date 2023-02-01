@@ -11,6 +11,8 @@ namespace MyAPI.Models
         [MaxLength(10)]
         public string? SoDienThoai { get; set; }
         [Required]
+        public string? Email { get; set; }
+        [Required]
         public string? DiaChi { get; set; }
     }
 }

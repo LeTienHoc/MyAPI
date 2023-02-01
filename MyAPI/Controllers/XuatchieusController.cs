@@ -53,7 +53,7 @@ namespace MyAPI.Controllers
             {
                 string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
                 var mank = (from nk in _context.Nhakiches
-                            where nk.TenNhaKich == idtaikhoan
+                            where nk.MaNhaKich == idtaikhoan
                             select nk.MaNhaKich).SingleOrDefault()?.ToString();
                 
                 var select = (from lc in _context.Lichchieus
@@ -118,7 +118,7 @@ namespace MyAPI.Controllers
         {
             string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
             var mank = (from nk in _context.Nhakiches
-                        where nk.TenNhaKich == idtaikhoan
+                        where nk.MaNhaKich == idtaikhoan
                         select nk.MaNhaKich).SingleOrDefault()?.ToString();
 
             var select = (from lc in _context.Lichchieus

@@ -183,15 +183,11 @@ namespace MyAPI.Data
 
                 entity.ToTable("taikhoan");
 
-                entity.Property(e => e.Email).HasMaxLength(225);
 
                 entity.Property(e => e.LoaiTaiKhoan).HasMaxLength(225);
 
                 entity.Property(e => e.MatKhau).HasMaxLength(255);
 
-                entity.Property(e => e.Sdt)
-                    .HasMaxLength(10)
-                    .HasColumnName("SDT");
 
                 entity.Property(e => e.TenTaiKhoan).HasMaxLength(255);
             });
