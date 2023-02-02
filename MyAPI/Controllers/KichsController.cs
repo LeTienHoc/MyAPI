@@ -31,25 +31,35 @@ namespace MyAPI.Controllers
         {
             try
             {
-                string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
-                var mank = (from nk in _context.Nhakiches
-                            where nk.MaNhaKich == idtaikhoan
-                            select nk.MaNhaKich).SingleOrDefault()!.ToString();
-                var kich = (from dd in _context.Kiches
-                               where dd.MaNhaKich!.Equals("" + mank + "")
-                               select new
-                               {
-                                   MaKich=dd.MaKich,
-                                   MaNhaKich=dd.MaNhaKich,
-                                   TenKich=dd.TenKich,
-                                   MoTa=dd.MoTa,
-                                   Image=dd.Image,
-                                   NgayBD=dd.NgayBd,
-                                   NgayKt=dd.NgayKt,
-                                   TheLoai=dd.TheLoai,
-                                   TrangThai=dd.TrangThai
-                               }).ToList();
-                return Ok(kich);
+                string role = HttpContext.User.FindFirst(ClaimTypes.Role)?.Value!;
+                if(role.Equals("admin"))
+                {
+                    return Ok(_KichRepo.GetAll());
+                }   
+                else if(role.Equals("Quản lý"))
+                {
+                    string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+                    var mank = (from nk in _context.Nhakiches
+                                where nk.MaNhaKich == idtaikhoan
+                                select nk.MaNhaKich).SingleOrDefault()!.ToString();
+                    var kich = (from dd in _context.Kiches
+                                where dd.MaNhaKich!.Equals("" + mank + "")
+                                select new
+                                {
+                                    MaKich = dd.MaKich,
+                                    MaNhaKich = dd.MaNhaKich,
+                                    TenKich = dd.TenKich,
+                                    MoTa = dd.MoTa,
+                                    Image = dd.Image,
+                                    NgayBD = dd.NgayBd,
+                                    NgayKt = dd.NgayKt,
+                                    TheLoai = dd.TheLoai,
+                                    TrangThai = dd.TrangThai
+                                }).ToList();
+                    return Ok(kich);
+                }
+                return Ok();
+               
             }
             catch
             {
@@ -59,9 +69,9 @@ namespace MyAPI.Controllers
         //[HttpGet]
         //public async Task< IActionResult> GetAllKich()
         //{
-            
+
         //        return Ok( _KichRepo.GetAll());
-            
+
         //}
 
         [HttpGet("{id}")]
@@ -71,7 +81,7 @@ namespace MyAPI.Controllers
             return  Kich==null ?NotFound():Ok(Kich);
         }
         
-        [Authorize(Roles = "quantrinhakich")]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddNewKich(KichModel model)
         {

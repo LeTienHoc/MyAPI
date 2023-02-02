@@ -33,22 +33,32 @@ namespace MyAPI.Controllers
 
             try
             {
-                string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
-                var mank = (from nk in _context.Nhakiches
-                            where nk.MaNhaKich == idtaikhoan
-                            select nk.MaNhaKich).SingleOrDefault()!.ToString();
-                var xuatchieu = (from kd in _context.Xuatchieus
-                               join d in _context.Lichchieus on kd.MaLichChieu equals d.MaLichChieu
-                               where d.MaNhaKich!.Equals("" + mank + "")
-                               select new
-                               {
-                                   MaXc=kd.MaXc,
-                                   MaKich=kd.MaKich,
-                                   MaLichChieu=kd.MaLichChieu,
-                                   NgayChieu=kd.NgayChieu,
-                                   ThoiGian=kd.Thoigian
-                               }).ToList();
-                return Ok(xuatchieu);
+                string role = HttpContext.User.FindFirst(ClaimTypes.Role)?.Value!;
+                if(role.Equals("admin"))
+                {
+                    return Ok(await _XuatchieuRepo.GetAll());
+                }   
+                else if(role.Equals("Quản lý"))
+                {
+                    string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+                    var mank = (from nk in _context.Nhakiches
+                                where nk.MaNhaKich == idtaikhoan
+                                select nk.MaNhaKich).SingleOrDefault()!.ToString();
+                    var xuatchieu = (from kd in _context.Xuatchieus
+                                     join d in _context.Lichchieus on kd.MaLichChieu equals d.MaLichChieu
+                                     where d.MaNhaKich!.Equals("" + mank + "")
+                                     select new
+                                     {
+                                         MaXc = kd.MaXc,
+                                         MaKich = kd.MaKich,
+                                         MaLichChieu = kd.MaLichChieu,
+                                         NgayChieu = kd.NgayChieu,
+                                         ThoiGian = kd.Thoigian
+                                     }).ToList();
+                    return Ok(xuatchieu);
+                }
+                return Ok();
+
             }
             catch
             {

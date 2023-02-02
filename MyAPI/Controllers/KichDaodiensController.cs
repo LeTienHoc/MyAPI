@@ -31,20 +31,30 @@ namespace MyAPI.Controllers
             
             try
             {
-                string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
-                var mank = (from nk in _context.Nhakiches
-                            where nk.MaNhaKich == idtaikhoan
-                            select nk.MaNhaKich).SingleOrDefault()!.ToString();
-                var daodien = (from kd in _context.KichDaodiens
-                                join d in _context.Daodiens on kd.MaDaodien equals d.MaDaoDien
-                                where d.MaNhaKich!.Equals("" + mank + "")
-                                select new
-                                {
-                                    MaDaoDien=d.MaDaoDien,
-                                    MaKich=kd.MaKich,
-                                    TenDaoDien=d.TenDaoDien
-                                }).ToList();
-                return Ok(daodien);
+                string role = HttpContext.User.FindFirst(ClaimTypes.Role)?.Value!;
+                if(role.Equals("admin"))
+                {
+                    return Ok(await _KichDaodienRepo.GetAll());
+                }    
+                else if(role.Equals("Quản lý"))
+                {
+                    string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+                    var mank = (from nk in _context.Nhakiches
+                                where nk.MaNhaKich == idtaikhoan
+                                select nk.MaNhaKich).SingleOrDefault()!.ToString();
+                    var daodien = (from kd in _context.KichDaodiens
+                                   join d in _context.Daodiens on kd.MaDaodien equals d.MaDaoDien
+                                   where d.MaNhaKich!.Equals("" + mank + "")
+                                   select new
+                                   {
+                                       MaDaoDien = d.MaDaoDien,
+                                       MaKich = kd.MaKich,
+                                       TenDaoDien = d.TenDaoDien
+                                   }).ToList();
+                    return Ok(daodien);
+                }
+                return Ok();
+                
             }
             catch
             {

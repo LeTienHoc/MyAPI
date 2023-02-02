@@ -31,21 +31,31 @@ namespace MyAPI.Controllers
         {
             try
             {
-                string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
-                var mank = (from nk in _context.Nhakiches
-                            where nk.MaNhaKich == idtaikhoan
-                            select nk.MaNhaKich).SingleOrDefault()!.ToString();
-                var ghe = (from dv in _context.Ghes
-                                where dv.MaNhaKich!.Equals("" + mank + "")
-                                select new
-                                {
-                                    MaGhe = dv.MaGhe,
-                                    MaNhaKich = dv.MaNhaKich,
-                                    Hang = dv.Hang,
-                                    Seat=dv.Seat,
-                                    Status=dv.Status
-                                }).ToList();
-                return Ok(ghe);
+                string role = HttpContext.User.FindFirst(ClaimTypes.Role)?.Value!;
+                if(role.Equals("admin"))
+                {
+                    return Ok(await _GheRepo.GetAll());
+                }    
+                else if(role.Equals("Quản lý"))
+                {
+                    string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+                    var mank = (from nk in _context.Nhakiches
+                                where nk.MaNhaKich == idtaikhoan
+                                select nk.MaNhaKich).SingleOrDefault()!.ToString();
+                    var ghe = (from dv in _context.Ghes
+                               where dv.MaNhaKich!.Equals("" + mank + "")
+                               select new
+                               {
+                                   MaGhe = dv.MaGhe,
+                                   MaNhaKich = dv.MaNhaKich,
+                                   Hang = dv.Hang,
+                                   Seat = dv.Seat,
+                                   Status = dv.Status
+                               }).ToList();
+                    return Ok(ghe);
+                }
+                return Ok();
+                
             }
             catch
             {

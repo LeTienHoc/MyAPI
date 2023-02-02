@@ -30,20 +30,30 @@ namespace MyAPI.Controllers
 
             try
             {
-                string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
-                var mank = (from nk in _context.Nhakiches
-                            where nk.MaNhaKich == idtaikhoan
-                            select nk.MaNhaKich).SingleOrDefault()!.ToString();
-                var dienvien = (from kd in _context.KichDienviens
-                                join d in _context.Dienviens on kd.MaDienVien equals d.MaDienVien
-                                where d.MaNhaKich!.Equals("" + mank + "")
-                                select new
-                                {
-                                    MaDienVien = d.MaDienVien,
-                                    MaKich = kd.MaKich,
-                                    TenDienVien = d.TenDienVien
-                                }).ToList();
-                return Ok(dienvien);
+                string role = HttpContext.User.FindFirst(ClaimTypes.Role)?.Value!;
+                if(role.Equals("admin"))
+                {
+                    return Ok(await _KichDienvienRepo.GetAll());
+                }    
+                else if(role.Equals("Quản lý"))
+                {
+                    string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+                    var mank = (from nk in _context.Nhakiches
+                                where nk.MaNhaKich == idtaikhoan
+                                select nk.MaNhaKich).SingleOrDefault()!.ToString();
+                    var dienvien = (from kd in _context.KichDienviens
+                                    join d in _context.Dienviens on kd.MaDienVien equals d.MaDienVien
+                                    where d.MaNhaKich!.Equals("" + mank + "")
+                                    select new
+                                    {
+                                        MaDienVien = d.MaDienVien,
+                                        MaKich = kd.MaKich,
+                                        TenDienVien = d.TenDienVien
+                                    }).ToList();
+                    return Ok(dienvien);
+                }
+                return Ok();
+                
             }
             catch
             {

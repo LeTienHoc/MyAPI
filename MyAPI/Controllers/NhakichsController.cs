@@ -30,21 +30,31 @@ namespace MyAPI.Controllers
 
             try
             {
-                string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
-                var mank = (from nk in _context.Nhakiches
-                            where nk.MaNhaKich == idtaikhoan
-                            select nk.MaNhaKich).SingleOrDefault()!.ToString();
-                var nhakich = (from kd in _context.Nhakiches
-                                 where kd.MaNhaKich!.Equals("" + mank + "")
-                                 select new
-                                 {
-                                     MaNhaKich=kd.MaNhaKich,
-                                     TenNhaKich=kd.TenNhaKich,
-                                     SoDienThoai=kd.SoDienThoai,
-                                     DiaChi=kd.DiaChi,
-                                     Email=kd.Email
-                                 }).ToList();
-                return Ok(nhakich);
+                string role = HttpContext.User.FindFirst(ClaimTypes.Role)?.Value!;
+                if(role.Equals("admin"))
+                {
+                    return Ok(await _NhakichRepo.GetAll());
+                }   
+                else if(role.Equals("Quản lý"))
+                {
+                    string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+                    var mank = (from nk in _context.Nhakiches
+                                where nk.MaNhaKich == idtaikhoan
+                                select nk.MaNhaKich).SingleOrDefault()!.ToString();
+                    var nhakich = (from kd in _context.Nhakiches
+                                   where kd.MaNhaKich!.Equals("" + mank + "")
+                                   select new
+                                   {
+                                       MaNhaKich = kd.MaNhaKich,
+                                       TenNhaKich = kd.TenNhaKich,
+                                       SoDienThoai = kd.SoDienThoai,
+                                       DiaChi = kd.DiaChi,
+                                       Email = kd.Email
+                                   }).ToList();
+                    return Ok(nhakich);
+                }
+                return Ok();
+                
             }
             catch
             {

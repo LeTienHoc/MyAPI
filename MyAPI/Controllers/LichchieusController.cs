@@ -31,20 +31,30 @@ namespace MyAPI.Controllers
 
             try
             {
-                string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
-                var mank = (from nk in _context.Nhakiches
-                            where nk.MaNhaKich == idtaikhoan
-                            select nk.MaNhaKich).SingleOrDefault()!.ToString();
-                var lichchieu = (from kd in _context.Lichchieus                               
-                               where kd.MaNhaKich!.Equals("" + mank + "")
-                               select new
-                               {
-                                   MaLichChieu=kd.MaLichChieu,
-                                   NgayBd=kd.NgayBd,
-                                   NgayKt=kd.NgayKt,
-                                   MaNhaKich=kd.MaNhaKich
-                               }).ToList();
-                return Ok(lichchieu);
+                string role = HttpContext.User.FindFirst(ClaimTypes.Role)?.Value!;
+                if(role.Equals("admin"))
+                {
+                    return Ok(await _LichchieuRepo.GetAll());
+                }   
+                else if(role.Equals("Quản lý"))
+                {
+                    string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+                    var mank = (from nk in _context.Nhakiches
+                                where nk.MaNhaKich == idtaikhoan
+                                select nk.MaNhaKich).SingleOrDefault()!.ToString();
+                    var lichchieu = (from kd in _context.Lichchieus
+                                     where kd.MaNhaKich!.Equals("" + mank + "")
+                                     select new
+                                     {
+                                         MaLichChieu = kd.MaLichChieu,
+                                         NgayBd = kd.NgayBd,
+                                         NgayKt = kd.NgayKt,
+                                         MaNhaKich = kd.MaNhaKich
+                                     }).ToList();
+                    return Ok(lichchieu);
+                }    
+                
+                return Ok();
             }
             catch
             {
