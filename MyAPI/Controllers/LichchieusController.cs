@@ -23,7 +23,34 @@ namespace MyAPI.Controllers
             _LichchieuRepo = repo;
             _context = context;
         }
+        [Authorize]
+        [HttpGet]
+        [Route("LichChieuCuaMoiNhakich")]
+        public async Task<IActionResult> GetAllLichChieuNK()
+        {
 
+            try
+            {
+                string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+                var mank = (from nk in _context.Nhakiches
+                            where nk.MaNhaKich == idtaikhoan
+                            select nk.MaNhaKich).SingleOrDefault()!.ToString();
+                var lichchieu = (from kd in _context.Lichchieus                               
+                               where kd.MaNhaKich!.Equals("" + mank + "")
+                               select new
+                               {
+                                   MaLichChieu=kd.MaLichChieu,
+                                   NgayBd=kd.NgayBd,
+                                   NgayKt=kd.NgayKt,
+                                   MaNhaKich=kd.MaNhaKich
+                               }).ToList();
+                return Ok(lichchieu);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
         [HttpGet]
         //[ProducesResponseType(StatusCodes.Status200OK)]
         //[ProducesResponseType(StatusCodes.Sta)]

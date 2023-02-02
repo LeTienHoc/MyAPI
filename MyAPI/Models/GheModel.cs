@@ -6,7 +6,7 @@ namespace MyAPI.Models
     {
         public string MaGhe { get; set; }
         [Required]
-        public string? NhaKich { get; set; }
+        public string? MaNhaKich { get; set; }
         [Required]
         public string? Hang { get; set; }
         [Required]

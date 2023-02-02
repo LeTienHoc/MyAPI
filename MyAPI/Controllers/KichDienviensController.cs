@@ -5,6 +5,7 @@ using MyAPI.Data;
 using MyAPI.Models;
 using MyAPI.Repositories;
 using System.Data;
+using System.Security.Claims;
 
 namespace MyAPI.Controllers
 {
@@ -21,7 +22,34 @@ namespace MyAPI.Controllers
             _KichDienvienRepo = repo;
             _context = context;
         }
+        [Authorize]
+        [HttpGet]
+        [Route("KichDienVienCuaMoiNhakich")]
+        public async Task<IActionResult> GetAllKichDienVienNK()
+        {
 
+            try
+            {
+                string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+                var mank = (from nk in _context.Nhakiches
+                            where nk.MaNhaKich == idtaikhoan
+                            select nk.MaNhaKich).SingleOrDefault()!.ToString();
+                var dienvien = (from kd in _context.KichDienviens
+                                join d in _context.Dienviens on kd.MaDienVien equals d.MaDienVien
+                                where d.MaNhaKich!.Equals("" + mank + "")
+                                select new
+                                {
+                                    MaDienVien = d.MaDienVien,
+                                    MaKich = kd.MaKich,
+                                    TenDienVien = d.TenDienVien
+                                }).ToList();
+                return Ok(dienvien);
+            }
+            catch
+            {
+                return BadRequest();
+            }
+        }
         [HttpGet]
         public async Task< IActionResult> GetAllKichDienvien()
         {

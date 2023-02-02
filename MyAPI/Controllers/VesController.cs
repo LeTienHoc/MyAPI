@@ -64,7 +64,7 @@ namespace MyAPI.Controllers
             string id = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value!;
             string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
             var count = (from ghes in _context.Ghes
-                         where ghes.Status == 0 && ghes.NhaKich!.Equals("NK000000002") 
+                         where ghes.Status == 0 && ghes.MaNhaKich!.Equals("NK000000002") 
                          select ghes.MaGhe).Count();
             
             if (soluong == 0)
@@ -92,11 +92,11 @@ namespace MyAPI.Controllers
                     //hàm trả về các mã ghế ng ta chọn
                     //load danh sách các ghế còn trống
                     var ghe = (from g in _context.Ghes
-                               where g.NhaKich == "NK000000002" 
+                               where g.MaNhaKich == "NK000000002" 
                                select new
                                {
                                    g.MaGhe,
-                                   g.NhaKich,
+                                   g.MaNhaKich,
                                    g.Hang,
                                    g.Seat,
                                    g.Status
@@ -105,7 +105,7 @@ namespace MyAPI.Controllers
                     var result = ghe.Select(g => new GheModel
                     {
                         MaGhe = g.MaGhe,
-                        NhaKich = g.NhaKich,
+                        MaNhaKich = g.MaNhaKich,
                         Hang = g.Hang,
                         Seat = g.Seat,
                         Status = g.Status

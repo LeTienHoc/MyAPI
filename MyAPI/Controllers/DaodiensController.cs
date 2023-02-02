@@ -22,13 +22,39 @@ namespace MyAPI.Controllers
             _daodienRepo = repo;
             _context = context;
         }
-
+        //[Authorize]
+        //[HttpGet]
+        //public async Task< IActionResult> GetAllDaodien()
+        //{
+        //    try
+        //    {
+        //        return Ok(await _daodienRepo.GetAll());
+        //    }
+        //    catch
+        //    {
+        //        return BadRequest();
+        //    }
+        //}
+        [Authorize]
         [HttpGet]
-        public async Task< IActionResult> GetAllDaodien()
+        [Route("DaoDienCuaMoiNhakich")]
+        public async Task<IActionResult> GetAllDaodienNK()
         {
             try
             {
-                return Ok(await _daodienRepo.GetAll());
+                string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+                var mank = (from nk in _context.Nhakiches
+                            where nk.MaNhaKich == idtaikhoan
+                            select nk.MaNhaKich).SingleOrDefault()!.ToString();
+                var daodien = (from dd in _context.Daodiens
+                              where dd.MaNhaKich!.Equals("" + mank + "")
+                              select new
+                              {
+                                  MaDaoDien=dd.MaDaoDien,
+                                  MaNhaKich=dd.MaNhaKich,
+                                  TenDaoDien=dd.TenDaoDien
+                              }).ToList();
+                return Ok( daodien);
             }
             catch
             {

@@ -22,19 +22,44 @@ namespace MyAPI.Controllers
             _DienvienRepo = repo;
             _context = context;
         }
-
+        [Authorize]
         [HttpGet]
-        public async Task< IActionResult> GetAllDienvien()
+        [Route("DienVienCuaMoiNhakich")]
+        public async Task<IActionResult> GetAllDienvienNK()
         {
             try
             {
-                return Ok(await _DienvienRepo.GetAll());
+                string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+                var mank = (from nk in _context.Nhakiches
+                            where nk.MaNhaKich == idtaikhoan
+                            select nk.MaNhaKich).SingleOrDefault()!.ToString();
+                var dienvien = (from dv in _context.Dienviens
+                               where dv.MaNhaKich!.Equals("" + mank + "")
+                               select new
+                               {
+                                   MaDienVien = dv.MaDienVien,
+                                   MaNhaKich = dv.MaNhaKich,
+                                   TenDienVien = dv.TenDienVien
+                               }).ToList();
+                return Ok(dienvien);
             }
             catch
             {
                 return BadRequest();
             }
         }
+        //[HttpGet]
+        //public async Task< IActionResult> GetAllDienvien()
+        //{
+        //    try
+        //    {
+        //        return Ok(await _DienvienRepo.GetAll());
+        //    }
+        //    catch
+        //    {
+        //        return BadRequest();
+        //    }
+        //}
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDienvienByID(string id)

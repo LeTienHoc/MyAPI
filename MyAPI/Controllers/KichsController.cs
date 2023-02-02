@@ -24,14 +24,45 @@ namespace MyAPI.Controllers
             _KichRepo = repo;
             _context = context;
         }
-
+        [Authorize]
         [HttpGet]
-        public async Task< IActionResult> GetAllKich()
+        [Route("KichCuaMoiNhakich")]
+        public async Task<IActionResult> GetAllKichNK()
         {
-            
-                return Ok( _KichRepo.GetAll());
-            
+            try
+            {
+                string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+                var mank = (from nk in _context.Nhakiches
+                            where nk.MaNhaKich == idtaikhoan
+                            select nk.MaNhaKich).SingleOrDefault()!.ToString();
+                var kich = (from dd in _context.Kiches
+                               where dd.MaNhaKich!.Equals("" + mank + "")
+                               select new
+                               {
+                                   MaKich=dd.MaKich,
+                                   MaNhaKich=dd.MaNhaKich,
+                                   TenKich=dd.TenKich,
+                                   MoTa=dd.MoTa,
+                                   Image=dd.Image,
+                                   NgayBD=dd.NgayBd,
+                                   NgayKt=dd.NgayKt,
+                                   TheLoai=dd.TheLoai,
+                                   TrangThai=dd.TrangThai
+                               }).ToList();
+                return Ok(kich);
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
+        //[HttpGet]
+        //public async Task< IActionResult> GetAllKich()
+        //{
+            
+        //        return Ok( _KichRepo.GetAll());
+            
+        //}
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetKichByID(string id)

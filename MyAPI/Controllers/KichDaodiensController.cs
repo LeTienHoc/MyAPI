@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MyAPI.Data;
 using MyAPI.Models;
 using MyAPI.Repositories;
 using System.Data;
+using System.Security.Claims;
 
 namespace MyAPI.Controllers
 {
@@ -21,19 +23,46 @@ namespace MyAPI.Controllers
             _KichDaodienRepo = repo;
             _context = context;
         }
-
+        [Authorize]
         [HttpGet]
-        public async Task< IActionResult> GetAllKichDaodien()
+        [Route("KichDaoDienCuaMoiNhakich")]
+        public async Task<IActionResult> GetAllKichDaoDienNK()
         {
+            
             try
             {
-                return Ok(await _KichDaodienRepo.GetAll());
+                string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+                var mank = (from nk in _context.Nhakiches
+                            where nk.MaNhaKich == idtaikhoan
+                            select nk.MaNhaKich).SingleOrDefault()!.ToString();
+                var daodien = (from kd in _context.KichDaodiens
+                                join d in _context.Daodiens on kd.MaDaodien equals d.MaDaoDien
+                                where d.MaNhaKich!.Equals("" + mank + "")
+                                select new
+                                {
+                                    MaDaoDien=d.MaDaoDien,
+                                    MaKich=kd.MaKich,
+                                    TenDaoDien=d.TenDaoDien
+                                }).ToList();
+                return Ok(daodien);
             }
             catch
             {
                 return BadRequest();
             }
         }
+        //[HttpGet]
+        //public async Task< IActionResult> GetAllKichDaodien()
+        //{
+        //    try
+        //    {
+        //        return Ok(await _KichDaodienRepo.GetAll());
+        //    }
+        //    catch
+        //    {
+        //        return BadRequest();
+        //    }
+        //}
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetKichDaodienByID(string id)

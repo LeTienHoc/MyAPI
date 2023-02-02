@@ -24,18 +24,46 @@ namespace MyAPI.Controllers
             _context = context;
         }
 
+        [Authorize]
         [HttpGet]
-        public async Task< IActionResult> GetAllGhe()
+        [Route("GheCuaMoiNhakich")]
+        public async Task<IActionResult> GetAllGheNK()
         {
             try
             {
-                return Ok(await _GheRepo.GetAll());
+                string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
+                var mank = (from nk in _context.Nhakiches
+                            where nk.MaNhaKich == idtaikhoan
+                            select nk.MaNhaKich).SingleOrDefault()!.ToString();
+                var ghe = (from dv in _context.Ghes
+                                where dv.MaNhaKich!.Equals("" + mank + "")
+                                select new
+                                {
+                                    MaGhe = dv.MaGhe,
+                                    MaNhaKich = dv.MaNhaKich,
+                                    Hang = dv.Hang,
+                                    Seat=dv.Seat,
+                                    Status=dv.Status
+                                }).ToList();
+                return Ok(ghe);
             }
             catch
             {
                 return BadRequest();
             }
         }
+        //[HttpGet]
+        //public async Task< IActionResult> GetAllGhe()
+        //{
+        //    try
+        //    {
+        //        return Ok(await _GheRepo.GetAll());
+        //    }
+        //    catch
+        //    {
+        //        return BadRequest();
+        //    }
+        //}
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetGheByID(string id)
@@ -53,7 +81,7 @@ namespace MyAPI.Controllers
                 var mank = (from nk in _context.Nhakiches
                             where nk.MaNhaKich == idtaikhoan
                             select nk.MaNhaKich).SingleOrDefault()!.ToString();
-                model.NhaKich = mank;
+                model.MaNhaKich = mank;
                 var newGheId = await _GheRepo.Add(model);
                 var Ghe = await _GheRepo.GetByID(newGheId);
                 return Ghe == null ? NotFound() : Ok(Ghe);
