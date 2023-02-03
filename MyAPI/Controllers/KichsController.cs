@@ -26,6 +26,25 @@ namespace MyAPI.Controllers
             _context = context;
             this._hostEnvironment = hostEnvironment;
         }
+        //public string ma()
+        //{
+        //    int result = _context.Kiches.Count() + 1;
+        //    if (result >= 0 && result < 10)
+        //        return "K00000000" + result;
+        //    else if (result >= 10 && result < 100)
+        //        return "K0000000" + result;
+        //    else if (result >= 100 && result < 1000)
+        //        return "K00000" + result;
+        //    else if (result >= 1000 && result < 10000)
+        //        return "K0000" + result;
+        //    else if (result >= 10000 && result < 100000)
+        //        return "K000" + result;
+        //    else if (result >= 100000 && result < 1000000)
+        //        return "K00" + result;
+        //    else if (result >= 1000000 && result < 10000000)
+        //        return "K0" + result;
+        //    else return "K" + result;
+        //}
         [Authorize]
         [HttpGet]
         [Route("KichCuaMoiNhakich")]
@@ -86,10 +105,11 @@ namespace MyAPI.Controllers
         
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> AddNewKich([FromForm] KichModel model)
+        public async Task<IActionResult> AddNewKich( KichModel model)
         {
             try
             {
+                //model.MaKich = ma();
                 var image = await SaveImage(model.ImageFile);
                 model.Image = image;
                 string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
@@ -110,10 +130,11 @@ namespace MyAPI.Controllers
             }
             
         }
-
+        
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateKich( string id, [FromForm] KichModel model)
+        public async Task<IActionResult> UpdateKich( string id,  KichModel model)
         {
+           
             if(model.NgayBd>model.NgayKt)
             {
                 return BadRequest(new ApiResponse
@@ -190,7 +211,7 @@ namespace MyAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteKich([FromForm] string id)
+        public async Task<IActionResult> DeleteKich( string id)
         {
             var ktdl = (from k in _context.Kiches
                         join xc in _context.Xuatchieus on k.MaKich equals xc.MaKich

@@ -82,7 +82,7 @@ namespace MyAPI.Controllers
             var Lichchieu= await _LichchieuRepo.GetByID(id);
             return  Lichchieu==null ?NotFound():Ok(Lichchieu);
         }
-        [Authorize(Roles = "quantrinhakich")]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddNewLichchieu(LichchieuModel model)
         {
@@ -172,8 +172,23 @@ namespace MyAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteLichchieu([FromRoute] string id)
         {
-            await _LichchieuRepo.Delete(id);
-            return Ok();
+            var kt = (from lc in _context.Lichchieus
+                      join xc in _context.Xuatchieus on lc.MaLichChieu equals xc.MaLichChieu
+                      where lc.MaLichChieu!.Equals("" + id + "")
+                      select lc.MaLichChieu).Count();
+            if(kt>0)
+            {
+                return BadRequest(new ApiResponse
+                {
+                    Success = false,
+                    Message = "Đã có Xuất Chiếu không thể xoá"
+                });
+            }  
+            else
+            {
+                await _LichchieuRepo.Delete(id);
+                return Ok();
+            }    
         }
     }
 }

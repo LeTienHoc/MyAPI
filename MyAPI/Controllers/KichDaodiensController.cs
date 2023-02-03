@@ -105,7 +105,7 @@ namespace MyAPI.Controllers
             }
             
         }
-        [Authorize]
+       
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateKichDaodien(string id,KichDaodienModel model)
         {
