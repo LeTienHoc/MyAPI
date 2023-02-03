@@ -57,7 +57,7 @@ namespace MyAPI.Controllers
                                     NgayKt = dd.NgayKt,
                                     TheLoai = dd.TheLoai,
                                     TrangThai = dd.TrangThai,
-                                    ImageSrc =String.Format("{0}://{1}{2}/Images/{3}",Request.Scheme,Request.Host,Request.PathBase,dd.Image)
+ //                                   ImageSrc =String.Format("{0}://{1}{2}/Images/{3}",Request.Scheme,Request.Host,Request.PathBase,dd.Image)
                                 }).ToList();
                     return Ok(kich);
                 }
@@ -69,13 +69,13 @@ namespace MyAPI.Controllers
                 return BadRequest();
             }
         }
-        //[HttpGet]
-        //public async Task<IActionResult> GetAllKich()
-        //{
+        [HttpGet]
+        public async Task<IActionResult> GetAllKich()
+        {
 
-        //    return Ok(_KichRepo.GetAll());
+            return Ok(_KichRepo.GetAll());
 
-        //}
+        }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetKichByID(string id)
@@ -86,19 +86,20 @@ namespace MyAPI.Controllers
         
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> AddNewKich(KichModel model)
+        public async Task<IActionResult> AddNewKich([FromForm] KichModel model)
         {
             try
             {
-
-                model.Image = await SaveImage(model.ImageFile);
+                var image = await SaveImage(model.ImageFile);
+                model.Image = image;
                 string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
                 var mank = (from nk in _context.Nhakiches
                             where nk.MaNhaKich == idtaikhoan
                             select nk.MaNhaKich).SingleOrDefault()!.ToString();
 
                // var mank1 = _context.Nhakiches.Select(x => x.TenNhaKich == idtaikhoan);
-                model.MaNhaKich = mank;  
+                model.MaNhaKich = mank;
+ //               model.ImageSrc = String.Format("{0}://{1}{2}/Images/{3}", Request.Scheme, Request.Host, Request.PathBase, image);
                 var newKichId = await _KichRepo.Add(model);
                 var Kich = await _KichRepo.GetByID(newKichId);
                 return Kich == null ? NotFound() : Ok(Kich);
@@ -111,17 +112,74 @@ namespace MyAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateKich(string id,KichModel model)
+        public async Task<IActionResult> UpdateKich( string id, [FromForm] KichModel model)
         {
-            if(model.ImageFile!=null)
+            if(model.NgayBd>model.NgayKt)
             {
-                DeleteImage(model.Image!);
-                model.Image = await SaveImage(model.ImageFile);
-                
-            }
-            await _KichRepo.Update(id, model);
-            return Ok();
+                return BadRequest(new ApiResponse
+                {
+                    Success = false,
+                    Message = "Ngày bắt đầu phải sau ngày kết thúc"
+                });
+            }    
+            else
+            {
+                var ktud = (from k in _context.Kiches
+                            join xc in _context.Xuatchieus on k.MaKich equals xc.MaKich
+                            where k.MaKich.Equals("" + id + "")
+                            select k.MaKich).Count();
+                //ktra kịch đã có xuất chiếu chưa
+                if (ktud > 0)
+                {
+                    var ktdl = (from k in _context.Kiches
+                                join xc in _context.Xuatchieus on k.MaKich equals xc.MaKich
+                                where k.MaKich.Equals("" + id + "") && model.NgayBd <= xc.NgayChieu && model.NgayKt >= xc.NgayChieu
+                                select k.MaKich).Count();
+                    //ktra xem ngày bd sau khi update có trong khoảng thời gian chiếu ko
+                    if (ktdl > 0)
+                    {
+                        //var xc1 = (from k in _context.Kiches
+                        //          join xc in _context.Xuatchieus on k.MaKich equals xc.MaKich
+                        //          where k.MaKich.Equals("" + id + "")
+                        //          select xc.NgayChieu).ToString();
+                        //DateTime myDate = DateTime.ParseExact(xc1!, "yyyy-MM-dd HH:mm:ss,fff",
+                        //                   System.Globalization.CultureInfo.InvariantCulture);
+                        //if (model.NgayBd<=myDate&&model.NgayKt>=myDate)
+                        //{
+                        if (model.ImageFile != null)
+                        {
+                            DeleteImage(model.Image!);
+                            model.Image = await SaveImage(model.ImageFile);
 
+                        }
+                        await _KichRepo.Update(id, model);
+                        return Ok();
+                        //  }   
+                    }
+                    else
+                    {
+                        return BadRequest(new ApiResponse
+                        {
+                            Success = false,
+                            Message = "Kịch Đã có xuất chiếu , vui lòng  update vào đúng khung giờ"
+                        });
+                    }
+                }
+                //chưa có thì update thẳng
+                else
+                {
+                    if (model.ImageFile != null)
+                    {
+                        DeleteImage(model.Image!);
+                        model.Image = await SaveImage(model.ImageFile);
+
+                    }
+                    await _KichRepo.Update(id, model);
+                    return Ok();
+                }
+            }                
+            return Ok();
+            
         }
         [Route("Duyet Kich")]
         [HttpPut]
@@ -132,10 +190,25 @@ namespace MyAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteKich([FromRoute] string id)
+        public async Task<IActionResult> DeleteKich([FromForm] string id)
         {
-            await _KichRepo.Delete(id);
-            return Ok();
+            var ktdl = (from k in _context.Kiches
+                        join xc in _context.Xuatchieus on k.MaKich equals xc.MaKich
+                        where k.MaKich.Equals("" + id + "") && xc.NgayChieu >= DateTime.Now
+                        select k.MaKich).Count();
+            if(ktdl > 0)
+            {
+                return Ok(new ApiResponse
+                {
+                    Success=false,
+                    Message="Đã có lịch diễn, không thể xoá"
+                });
+            }  
+            else
+            {
+                await _KichRepo.Delete(id);
+                return Ok();
+            }               
         }
         [Route("Search")]
         [HttpGet]

@@ -63,7 +63,9 @@ namespace MyAPI.Repositories
 
         public async Task Delete(string id)
         {
-            var deleteKich = _context.Kiches!.SingleOrDefault(b=>b.MaKich==id);
+            
+              
+            var deleteKich = _context.Kiches!.SingleOrDefault(b=>b.MaKich==id);           
             if(deleteKich!=null)
             {
                 _context.Kiches.Remove(deleteKich);
