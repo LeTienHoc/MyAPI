@@ -18,11 +18,13 @@ namespace MyAPI.Controllers
     {
         private readonly IKichRepository _KichRepo;
         private readonly MyDbContext _context;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
-        public KichsController(IKichRepository repo,MyDbContext context)
+        public KichsController(IKichRepository repo,MyDbContext context, IWebHostEnvironment hostEnvironment)
         {
             _KichRepo = repo;
             _context = context;
+            this._hostEnvironment = hostEnvironment;
         }
         [Authorize]
         [HttpGet]
@@ -54,7 +56,8 @@ namespace MyAPI.Controllers
                                     NgayBD = dd.NgayBd,
                                     NgayKt = dd.NgayKt,
                                     TheLoai = dd.TheLoai,
-                                    TrangThai = dd.TrangThai
+                                    TrangThai = dd.TrangThai,
+                                    ImageSrc =String.Format("{0}://{1}{2}/Images/{3}",Request.Scheme,Request.Host,Request.PathBase,dd.Image)
                                 }).ToList();
                     return Ok(kich);
                 }
@@ -67,10 +70,10 @@ namespace MyAPI.Controllers
             }
         }
         //[HttpGet]
-        //public async Task< IActionResult> GetAllKich()
+        //public async Task<IActionResult> GetAllKich()
         //{
 
-        //        return Ok( _KichRepo.GetAll());
+        //    return Ok(_KichRepo.GetAll());
 
         //}
 
@@ -87,8 +90,8 @@ namespace MyAPI.Controllers
         {
             try
             {
-                
-                
+
+                model.Image = await SaveImage(model.ImageFile);
                 string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
                 var mank = (from nk in _context.Nhakiches
                             where nk.MaNhaKich == idtaikhoan
@@ -110,8 +113,15 @@ namespace MyAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateKich(string id,KichModel model)
         {
+            if(model.ImageFile!=null)
+            {
+                DeleteImage(model.Image!);
+                model.Image = await SaveImage(model.ImageFile);
+                
+            }
             await _KichRepo.Update(id, model);
             return Ok();
+
         }
         [Route("Duyet Kich")]
         [HttpPut]
@@ -158,6 +168,25 @@ namespace MyAPI.Controllers
             {
                 return BadRequest();
             }
+        }
+        [NonAction]       
+        public async Task<string> SaveImage(IFormFile imageFile)
+        {
+            string imageName = new String(Path.GetFileNameWithoutExtension(imageFile.FileName).Take(10).ToArray()).Replace(' ', '-');
+            imageName= imageName+DateTime.Now.ToString("yymmssfff")+Path.GetExtension(imageFile.FileName);
+            var imagePath = Path.Combine(_hostEnvironment.ContentRootPath, "Images", imageName);
+            using(var fileStream = new FileStream(imagePath,FileMode.Create))
+            {
+               await imageFile.CopyToAsync(fileStream);
+            }
+            return imageName;
+        }
+        [NonAction]
+        public void DeleteImage(string imageName)
+        {
+            var imagePath = Path.Combine(_hostEnvironment.ContentRootPath, "Images", imageName);
+            if(System.IO.File.Exists(imagePath))
+                System.IO.File.Delete(imagePath);
         }
     }
 }

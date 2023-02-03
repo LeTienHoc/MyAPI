@@ -1,5 +1,6 @@
 ﻿using MyAPI.Data;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MyAPI.Models
 {
@@ -23,6 +24,11 @@ namespace MyAPI.Models
         public string? TheLoai { get; set; }
         
         public ulong? TrangThai { get; set; }
-        
+        [NotMapped]
+        public IFormFile ImageFile { get; set; }
+        [NotMapped]
+        public string ImageSrc { get; set; }
+
+
     }
 }
