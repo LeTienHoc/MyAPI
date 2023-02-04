@@ -107,7 +107,7 @@ namespace MyAPI.Controllers
         {
 
             var kich = (from dd in _context.Kiches
-                        where dd.TrangThai.Equals(1)
+                        where dd.TrangThai == 1
                         select new
                         {
                             MaKich = dd.MaKich,
