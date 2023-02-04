@@ -55,7 +55,21 @@ namespace MyAPI.Controllers
                 string role = HttpContext.User.FindFirst(ClaimTypes.Role)?.Value!;
                 if(role.Equals("admin"))
                 {
-                    return Ok(_KichRepo.GetAll());
+                    var kich = (from dd in _context.Kiches
+                                select new
+                                {
+                                    MaKich = dd.MaKich,
+                                    MaNhaKich = dd.MaNhaKich,
+                                    TenKich = dd.TenKich,
+                                    MoTa = dd.MoTa,
+                                    Image = dd.Image,
+                                    NgayBD = dd.NgayBd,
+                                    NgayKt = dd.NgayKt,
+                                    TheLoai = dd.TheLoai,
+                                    TrangThai = dd.TrangThai,
+                                    //    ImageSrc =String.Format("{0}://{1}{2}/Images/{3}",Request.Scheme,Request.Host,Request.PathBase,dd.Image)
+                                }).ToList();
+                    return Ok(kich);
                 }   
                 else if(role.Equals("Quản lý"))
                 {
@@ -92,7 +106,22 @@ namespace MyAPI.Controllers
         public async Task<IActionResult> GetAllKich()
         {
 
-            return Ok(_KichRepo.GetAll());
+            var kich = (from dd in _context.Kiches
+                        where dd.TrangThai.Equals(1)
+                        select new
+                        {
+                            MaKich = dd.MaKich,
+                            MaNhaKich = dd.MaNhaKich,
+                            TenKich = dd.TenKich,
+                            MoTa = dd.MoTa,
+                            Image = dd.Image,
+                            NgayBD = dd.NgayBd,
+                            NgayKt = dd.NgayKt,
+                            TheLoai = dd.TheLoai,
+                            TrangThai = dd.TrangThai,
+                            //                                   ImageSrc =String.Format("{0}://{1}{2}/Images/{3}",Request.Scheme,Request.Host,Request.PathBase,dd.Image)
+                        }).ToList();
+            return Ok(kich);
 
         }
 
