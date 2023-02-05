@@ -33,7 +33,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
-    policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
+    policy.WithOrigins("*").AllowAnyHeader().AllowAnyMethod()));
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<MyDbContext>(options =>

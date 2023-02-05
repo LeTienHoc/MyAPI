@@ -10,6 +10,7 @@ namespace MyAPI.Repositories
         public Task<string> Add(VeModel Ve);
         public Task Update(string id,VeModel Ve);
         public Task Delete(string id);
+        public Task XoaVe(string id, DeleteVeModel model);
      //   public Task SeatGhe(GheModel Ghe,int soluong);
     }
 }

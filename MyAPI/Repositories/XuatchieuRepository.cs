@@ -37,14 +37,7 @@ namespace MyAPI.Repositories
         public async Task<string> Add(XuatchieuModel Xuatchieu)
         {
             var newXuatchieu = _mapper.Map<Xuatchieu>(Xuatchieu);
-            //      var ktlichdien = 
-            //var convert= (Convert.ToDateTime(Xuatchieu.NgayGio)).ToString("HH:mm:ss tt");
-            //var select = (from xc in _context.Xuatchieus
-            //             join lc in _context.Lichchieus on xc.MaLichChieu equals lc.MaLichChieu
-            //             where lc.NgayBd<=Xuatchieu.NgayGio && lc.NgayKt>=Xuatchieu.NgayGio
-            //             select xc.MaLichChieu).SingleOrDefault()?.Count();
-            //if(select>=1)
-            //{
+            
                 newXuatchieu.MaXc = ma();
                 _context.Xuatchieus!.Add(newXuatchieu);
                 await _context.SaveChangesAsync();

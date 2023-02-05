@@ -58,122 +58,60 @@ namespace MyAPI.Controllers
         [HttpPost]
         [Authorize]
         //[Authorize(Roles = "quantrinhakich")]
-        public async Task<IActionResult> AddNewVe(VeModel model,int soluong)
+        public async Task<IActionResult> AddNewVe(VeModel model)
         {
             
             string id = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value!;
             string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
-            var count = (from ghes in _context.Ghes
-                         where ghes.Status == 0 && ghes.MaNhaKich!.Equals("NK000000002") 
-                         select ghes.MaGhe).Count();
+            //var count = (from ghes in _context.Ghes
+            //             where ghes.MaNhaKich!.Equals("NK000000002") 
+            //             select ghes.MaGhe).Count();
             
-            if (soluong == 0)
-            {
-                return BadRequest(new ApiResponse
-                {
-                    Success = false,
-                    Message = "Bạn chưa chọn số lượng ghế"
-                });
-            }
-            else
-            {
-                if (soluong > count)
-                {
-                    return BadRequest(new ApiResponse
-                    {
-                        Success = false,
-                        Message = "Số lượng ghế không đủ"
-                    });
-                }
-                else
-                {
-
-                    //input đầu vào (ng dùng chọn ghế nào trong ghée trống)
-                    //hàm trả về các mã ghế ng ta chọn
-                    //load danh sách các ghế còn trống
-                    var ghe = (from g in _context.Ghes
-                               where g.MaNhaKich == "NK000000002" 
-                               select new
-                               {
-                                   g.MaGhe,
-                                   g.MaNhaKich,
-                                   g.Hang,
-                                   g.Seat,
-                                   g.Status
-                               }).ToList();
-
-                    var result = ghe.Select(g => new GheModel
-                    {
-                        MaGhe = g.MaGhe,
-                        MaNhaKich = g.MaNhaKich,
-                        Hang = g.Hang,
-                        Seat = g.Seat,
-                        Status = g.Status
-                    }).ToList();
-
-                    List<GheModel> gheModels = new List<GheModel>();
-                    gheModels.AddRange(result);
-
-                    
-
-                    //var ghe = (from g in _context.Ghes
-                    //          where g.NhaKich== "NK000000002" && g.MaGhe.Contains(model.MaGhe!)
-                    //          select new 
-                    //          { 
-                    //             g.MaGhe,
-                    //             g.NhaKich,
-                    //             g.Hang,
-                    //             g.Seat,
-                    //             g.Status
-                    //          }).ToList();
-                    
-                    //var result = ghe.Select(g=>new GheModel
-                    //{
-                    //    MaGhe=g.MaGhe,
-                    //    NhaKich=g.NhaKich,
-                    //    Hang=g.Hang,
-                    //    Seat=g.Seat,
-                    //    Status=g.Status
-                    //}).ToList();
-                    
-                    //List<GheModel> gheModels= new List<GheModel>();
-                    //gheModels.AddRange(result);
-                    
-                  
- //                 
-                }
-            }
-
-
 
             if (id!=null || idtaikhoan!=null)
             {
-                model.MaKh = id;
-                model.MaTk = idtaikhoan;
-                var newVeId = await _VeRepo.Add(model);
+                //var ktghe = from g in _context.Ghes
+                //            join v in _context.Ves on g.MaGhe equals v.MaGhe
+                //            where g.MaGhe.Equals(
 
-                if (newVeId == "2")
+                //                model.MaGhe) && g.MaNhaKich.Equals("");
+                var makh = (from kh in _context.Khachhangs
+                            where kh.TenKh!.Equals(id)
+                            select kh.MaKh).SingleOrDefault()!.ToString();
+                var manhakich = (from xc in _context.Xuatchieus
+                                 join k in _context.Kiches on xc.MaKich equals k.MaKich
+                                 where xc.MaXc.Equals("" + model.MaXc + "")
+                                 select k.MaNhaKich).SingleOrDefault();
+                var ghetrong = (from g in _context.Ghes
+                                where g.MaNhaKich!.Equals("" + manhakich + "")
+                                select g.MaGhe).ToList();
+                var ghedamua = (from g in _context.Ghes
+                               join v in _context.Ves on g.MaGhe equals v.MaGhe
+                               join xc in _context.Xuatchieus on v.MaXc equals xc.MaXc
+                               join k in _context.Kiches on xc.MaKich equals k.MaKich
+                               where xc.MaXc.Equals("" + model.MaXc + "") && v.TinhTrang.Equals(1)
+                               select g.MaGhe).ToList();
+                var getghe = ghetrong.Except(ghedamua).ToList();
+                var c = ghedamua.Where(t => t.Equals("" + model.MaGhe + "")).Count();
+                if(c>0)
                 {
                     return BadRequest(new ApiResponse
                     {
-                        Success = false,
-                        Message = "Ban chua chon ghe"
+                        Message = "Vé đã có người đặt trước ròi",
+                        Success=false,
                     });
-                }
-                if (newVeId == "3")
-                {
-                    return BadRequest(new ApiResponse
-                    {
-                        Success = false,
-                        Message = "Ban chua chon xuat chieu"
-                    });
-                }
+                }    
                 else
                 {
+                    model.MaKh = id;
+                    model.MaTk = idtaikhoan;
+                    model.TinhTrang = 1;
+                    model.NgayDatVe = DateTime.Now;
+                    var newVeId = await _VeRepo.Add(model);
+
                     var Ve = await _VeRepo.GetByID(newVeId);
                     return Ve == null ? NotFound() : Ok(Ve);
-                }
-                
+                }    
             } 
             else
             {
@@ -184,6 +122,43 @@ namespace MyAPI.Controllers
                 });
             }    
         }
+        //public async Task<IActionResult> Thanhtoan()
+        //{
+        //    var ghedachon = (from gc in _context.Ves
+        //                     where 
+        //                     ).ToList();
+        //}
+        [Route("Ghe trong")]
+        [HttpGet]
+        public async Task<IActionResult> ShowGheConTrong(string xuatchieu)
+        {
+            var manhakich = (from xc in _context.Xuatchieus
+                             join k in _context.Kiches on xc.MaKich equals k.MaKich
+                             where xc.MaXc.Equals("" + xuatchieu + "")
+                             select k.MaNhaKich).SingleOrDefault();
+            var ghetrong = (from g in _context.Ghes
+                            where g.MaNhaKich!.Equals("" + manhakich + "")
+                            select new
+                            {
+                                MaGhe = g.MaGhe,
+                                Hang=g.Hang,
+                                Seat=g.Seat
+                            }).ToList();
+            var ghedamua = (from g in _context.Ghes
+                           join v in _context.Ves on g.MaGhe equals v.MaGhe
+                           join xc in _context.Xuatchieus on v.MaXc equals xc.MaXc
+                           join k in _context.Kiches on xc.MaKich equals k.MaKich
+                           where xc.MaXc.Equals(""+xuatchieu+"") && v.TinhTrang.Equals(1)
+                            select new
+                            {
+                                MaGhe = g.MaGhe,
+                                Hang = g.Hang,
+                                Seat = g.Seat
+                            }).ToList();
+            var c = ghetrong.Except(ghedamua).ToList();
+            return Ok(c);
+        }
+
         //[HttpPost]
         //[Authorize]
         //[Route("Đặt Vé")]
@@ -295,10 +270,11 @@ namespace MyAPI.Controllers
             return Ok();
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteVe([FromRoute] string id)
+        [HttpPost("{id}")]
+        public async Task<IActionResult> DeleteVe([FromRoute] string id,DeleteVeModel model)
         {
-            await _VeRepo.Delete(id);
+            model.TinhTrang = 0;
+            await _VeRepo.XoaVe(id,model);
             return Ok();
         }
     }

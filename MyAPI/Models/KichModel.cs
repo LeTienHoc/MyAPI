@@ -25,7 +25,7 @@ namespace MyAPI.Models
         
         public ulong? TrangThai { get; set; }
         [NotMapped]
-        public IFormFile ImageFile { get; set; }
+        public string ImageFile { get; set; }
         //[NotMapped]
         //public string ImageSrc { get; set; }
 

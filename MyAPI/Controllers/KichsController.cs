@@ -57,6 +57,7 @@ namespace MyAPI.Controllers
                 if(role.Equals("admin"))
                 {
                     var kich = (from dd in _context.Kiches
+                                where dd.NgayBd<=DateTime.Now && dd.NgayKt>=DateTime.Now
                                 select new
                                 {
                                     MaKich = dd.MaKich,
@@ -132,35 +133,43 @@ namespace MyAPI.Controllers
             var Kich= await _KichRepo.GetByID(id);
             return  Kich==null ?NotFound():Ok(Kich);
         }
-        
+
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> AddNewKich([FromForm] KichModel model)
+        public async Task<IActionResult> AddNewKich(KichModel model)
         {
             try
             {
-                model.MaKich = ma();
-                var image = await SaveImage(model.ImageFile);
-                model.Image = image;
                 string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
                 var mank = (from nk in _context.Nhakiches
                             where nk.MaNhaKich == idtaikhoan
                             select nk.MaNhaKich).SingleOrDefault()!.ToString();
 
-               // var mank1 = _context.Nhakiches.Select(x => x.TenNhaKich == idtaikhoan);
+                // var mank1 = _context.Nhakiches.Select(x => x.TenNhaKich == idtaikhoan);
                 model.MaNhaKich = mank;
- //               model.ImageSrc = String.Format("{0}://{1}{2}/Images/{3}", Request.Scheme, Request.Host, Request.PathBase, image);
+                //             model.ImageSrc = String.Format("{0}://{1}{2}/Images/{3}", Request.Scheme, Request.Host, Request.PathBase, image);
                 var newKichId = await _KichRepo.Add(model);
-                var Kich = await _KichRepo.GetByID(newKichId);
-                return Kich == null ? NotFound() : Ok(Kich);
+                if(newKichId==null)
+                {
+                    return BadRequest(new ApiResponse
+                    {
+                        Message = "Ngày bắt đầu phải trước ngày kết thúc",
+                        Success = false
+                    });
+                }  
+                else
+                {
+                    var Kich = await _KichRepo.GetByID(newKichId);
+                    return Kich == null ? NotFound() : Ok(Kich);
+                }    
             }
             catch
             {
                 return BadRequest();
             }
-            
+
         }
-        
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateKich( string id,  KichModel model)
         {
@@ -170,7 +179,7 @@ namespace MyAPI.Controllers
                 return BadRequest(new ApiResponse
                 {
                     Success = false,
-                    Message = "Ngày bắt đầu phải sau ngày kết thúc"
+                    Message = "Ngày bắt đầu phải trước ngày kết thúc"
                 });
             }    
             else
@@ -197,12 +206,7 @@ namespace MyAPI.Controllers
                         //                   System.Globalization.CultureInfo.InvariantCulture);
                         //if (model.NgayBd<=myDate&&model.NgayKt>=myDate)
                         //{
-                        if (model.ImageFile != null)
-                        {
-                            DeleteImage(model.Image!);
-                            model.Image = await SaveImage(model.ImageFile);
-
-                        }
+                        
                         await _KichRepo.Update(id, model);
                         return Ok();
                         //  }   
@@ -219,12 +223,7 @@ namespace MyAPI.Controllers
                 //chưa có thì update thẳng
                 else
                 {
-                    if (model.ImageFile != null)
-                    {
-                        DeleteImage(model.Image!);
-                        model.Image = await SaveImage(model.ImageFile);
-
-                    }
+                    
                     await _KichRepo.Update(id, model);
                     return Ok();
                 }
@@ -293,17 +292,40 @@ namespace MyAPI.Controllers
                 return BadRequest();
             }
         }
-        [NonAction]       
-        public async Task<string> SaveImage(IFormFile imageFile)
+        //[NonAction]       
+        //public async Task<string> SaveImage(IFormFile imageFile)
+        //{
+        //    string imageName = new String(Path.GetFileNameWithoutExtension(imageFile.FileName).Take(10).ToArray()).Replace(' ', '-');
+        //    imageName= imageName+DateTime.Now.ToString("yymmssfff")+Path.GetExtension(imageFile.FileName);
+        //    var imagePath = Path.Combine(_hostEnvironment.ContentRootPath, "Images", imageName);
+        //    using(var fileStream = new FileStream(imagePath,FileMode.Create))
+        //    {
+        //       await imageFile.CopyToAsync(fileStream);
+        //    }
+        //    return imageName;
+        //}
+        [Route("SaveFile")]
+        [HttpPost]
+        public JsonResult SaveFile()
         {
-            string imageName = new String(Path.GetFileNameWithoutExtension(imageFile.FileName).Take(10).ToArray()).Replace(' ', '-');
-            imageName= imageName+DateTime.Now.ToString("yymmssfff")+Path.GetExtension(imageFile.FileName);
-            var imagePath = Path.Combine(_hostEnvironment.ContentRootPath, "Images", imageName);
-            using(var fileStream = new FileStream(imagePath,FileMode.Create))
+            try
             {
-               await imageFile.CopyToAsync(fileStream);
+                var httpRequest = Request.Form;
+                var postedFile = httpRequest.Files[0];
+                string filename = postedFile.FileName;
+                var physicalPath = _hostEnvironment.ContentRootPath + "/Images/" + filename;
+
+                using (var stream = new FileStream(physicalPath, FileMode.Create))
+                {
+                    postedFile.CopyTo(stream);
+                }
+
+                return new JsonResult(filename);
             }
-            return imageName;
+            catch (Exception)
+            {
+                return new JsonResult("anonymous.png");
+            }
         }
         [NonAction]
         public void DeleteImage(string imageName)

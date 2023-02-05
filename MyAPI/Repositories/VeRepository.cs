@@ -37,36 +37,17 @@ namespace MyAPI.Repositories
                 return "V0" + result;
             else return "V" + result;
         }
-        public string findkh()
-        {
-
-            //return int.Parse(this._context.Taikhoans.Claims.First(i => i.Type == "UserId").Value);
-
-            string loi = "";
-            //var khach = _context.Khachhangs.Where(o => o.MaKh == kh);
-            //if(khach.Any())
-            //{
-            //    var khachhang = _context.Khachhangs.FindAsync(kh).Result.MaKh;
-            //    return khachhang;
-            //}
-            return loi;
-
-
-
-        }
+        
         public string findxc(string xc)
         {
             var xuatchieu = _context.Xuatchieus.FindAsync(xc).Result!.MaXc;
             return xuatchieu;
         }
-        public string findghe(string g,int sl)
+        public string findghe(string g)
         {
-            for (int i=1;i<=sl;i++)
-            {
+            
                 var ghe = _context.Ghes.FindAsync(g).Result!.MaGhe;
-                return ghe;
-            }    
-            return g;
+                return ghe;          
             
         }
         public async Task<string> Add(VeModel Ve)
@@ -74,13 +55,10 @@ namespace MyAPI.Repositories
             
 
             var newVe = _mapper.Map<Ve>(Ve);
-            //if (findkh(Ve.MaKh) == "")
-            //{
-            //    return null;
-            //}
+            
             newVe.MaVe = ma();
-            newVe.MaXc = findxc(Ve.MaXc);
-            newVe.MaGhe = findghe(Ve.MaGhe,3);
+            newVe.MaXc = findxc(Ve.MaXc!);
+            newVe.MaGhe = findghe(Ve.MaGhe!);
 
 
             _context.Ves!.Add(newVe);
@@ -120,6 +98,18 @@ namespace MyAPI.Repositories
                 _context.Ves!.Update(updateVe);
                 await _context.SaveChangesAsync();
             }    
+        }
+        public async Task XoaVe(string id, DeleteVeModel model)
+        {
+            var updateKich = _mapper.Map<Ve>(model);
+            updateKich = (from k in _context.Ves
+                          where k.MaVe == id
+                          select k).SingleOrDefault();
+
+            updateKich!.TinhTrang = model.TinhTrang;
+
+            _context.SaveChanges();
+
         }
 
     }

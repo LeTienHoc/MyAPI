@@ -84,7 +84,7 @@ namespace MyAPI.Controllers
             var Xuatchieu= await _XuatchieuRepo.GetByID(id);
             return  Xuatchieu==null ?NotFound():Ok(Xuatchieu);
         }
-        [Authorize(Roles = "quantrinhakich")]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> AddNewXuatchieu(XuatchieuModel model)
         {
@@ -108,15 +108,29 @@ namespace MyAPI.Controllers
 
                     if (kich>0)
                     {
-                    var ktlich = (from lc in _context.Lichchieus
+                     var ktlich = (from lc in _context.Lichchieus
                                   where lc.MaNhaKich == "" + mank + "" && lc.NgayBd <= model.NgayChieu && lc.NgayKt >= model.NgayChieu
                                   select lc.MaLichChieu).SingleOrDefault()?.ToString();
                         if (model.MaLichChieu==ktlich)
                         {
-                        
-                            var newXuatchieuId = await _XuatchieuRepo.Add(model);
-                            var Xuatchieu = await _XuatchieuRepo.GetByID(newXuatchieuId);
-                            return Xuatchieu == null ? NotFound() : Ok(Xuatchieu);
+                            var ngaychieu = (from k in _context.Kiches
+                                             join xc in _context.Xuatchieus on k.MaKich equals xc.MaKich
+                                             where k.MaNhaKich.Equals("" + mank + "") && xc.NgayChieu==model.NgayChieu
+                                             select k.MaKich).Count();
+                            if(ngaychieu>0)
+                            {
+                                return BadRequest(new ApiResponse
+                                {
+                                    Message = "Ngày hôm nay đã có xuất chiếu",
+                                    Success = false
+                                });
+                            }    
+                            else
+                            {
+                                var newXuatchieuId = await _XuatchieuRepo.Add(model);
+                                var Xuatchieu = await _XuatchieuRepo.GetByID(newXuatchieuId);
+                                return Xuatchieu == null ? NotFound() : Ok(Xuatchieu);
+                            }    
                         }  
                         else
                         {

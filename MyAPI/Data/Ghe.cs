@@ -13,6 +13,6 @@ namespace MyAPI.Data
         public string? Hang { get; set; }
         [Required]
         public int? Seat { get; set; }
-        public int Status { get; set; }
+
     }
 }

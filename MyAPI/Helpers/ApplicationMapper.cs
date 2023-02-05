@@ -24,6 +24,7 @@ namespace MyAPI.Helpers
             CreateMap<Nhakich, NhakichModel>().ReverseMap();
             CreateMap<Taikhoan, TaikhoanModel>().ReverseMap();
             CreateMap<Ve, VeModel>().ReverseMap();
+            CreateMap<Ve, DeleteVeModel>().ReverseMap();
             CreateMap<Kich, UpdateModel>().ReverseMap();
             CreateMap<Xuatchieu, XuatchieuModel>().ReverseMap();
         }

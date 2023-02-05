@@ -46,7 +46,7 @@ namespace MyAPI.Repositories
         public async Task<string> Add(KichModel Kich)
         {
             var newKich = _mapper.Map<Kich>(Kich);
-            if(newKich.NgayBd<newKich.NgayKt)
+            if(newKich.NgayBd<=newKich.NgayKt)
             {
                 newKich.MaKich = ma();
                 _context.Kiches!.Add(newKich);
@@ -148,7 +148,7 @@ namespace MyAPI.Repositories
             if(id == Kich.MaKich)
             {
                 var updateKich = _mapper.Map<Kich>(Kich);
-                if(updateKich.NgayBd<updateKich.NgayKt)
+                if(updateKich.NgayBd<=updateKich.NgayKt)
                 {                   
                     _context.Kiches!.Update(updateKich);
                     await _context.SaveChangesAsync();

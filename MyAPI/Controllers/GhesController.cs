@@ -49,8 +49,7 @@ namespace MyAPI.Controllers
                                    MaGhe = dv.MaGhe,
                                    MaNhaKich = dv.MaNhaKich,
                                    Hang = dv.Hang,
-                                   Seat = dv.Seat,
-                                   Status = dv.Status
+                                   Seat = dv.Seat,                                
                                }).ToList();
                     return Ok(ghe);
                 }
