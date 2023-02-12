@@ -18,7 +18,7 @@ namespace MyAPI.Repositories
         private readonly IMapper _mapper;
         public static int PAGE_SIZE { get; set; } = 5;
 
-        public KichRepository(MyDbContext context,IMapper mapper)
+        public KichRepository(MyDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
@@ -46,31 +46,31 @@ namespace MyAPI.Repositories
         public async Task<string> Add(KichModel Kich)
         {
             var newKich = _mapper.Map<Kich>(Kich);
-            if(newKich.NgayBd<=newKich.NgayKt)
+            if (newKich.NgayBd <= newKich.NgayKt)
             {
                 newKich.MaKich = ma();
                 _context.Kiches!.Add(newKich);
                 await _context.SaveChangesAsync();
-            }   
+            }
             else
             {
                 return null;
-            }    
-            
+            }
+
 
             return newKich.MaKich;
         }
 
         public async Task Delete(string id)
         {
-            
-              
-            var deleteKich = _context.Kiches!.SingleOrDefault(b=>b.MaKich==id);           
-            if(deleteKich!=null)
+
+
+            var deleteKich = _context.Kiches!.SingleOrDefault(b => b.MaKich == id);
+            if (deleteKich != null)
             {
                 _context.Kiches.Remove(deleteKich);
                 await _context.SaveChangesAsync();
-            }    
+            }
         }
 
         public List<KichPageModel> GetAll()
@@ -145,15 +145,15 @@ namespace MyAPI.Repositories
 
         public async Task Update(string id, KichModel Kich)
         {
-            if(id == Kich.MaKich)
+            if (id == Kich.MaKich)
             {
                 var updateKich = _mapper.Map<Kich>(Kich);
-                if(updateKich.NgayBd<=updateKich.NgayKt)
-                {                   
+                if (updateKich.NgayBd <= updateKich.NgayKt)
+                {
                     _context.Kiches!.Update(updateKich);
                     await _context.SaveChangesAsync();
-                }    
-            }    
+                }
+            }
         }
         public List<KichPageModel> Detail(string id)
         {
@@ -162,7 +162,7 @@ namespace MyAPI.Repositories
                                 join v1 in _context.Dienviens on dv1.MaDienVien equals v1.MaDienVien
                                 join kd1 in _context.KichDaodiens on k1.MaKich equals kd1.MaKich
                                 join dd1 in _context.Daodiens on kd1.MaDaodien equals dd1.MaDaoDien
-                                where k1.MaKich==""+id+""
+                                where k1.MaKich == "" + id + ""
                                 select new
                                 {
                                     k1.MaKich,
@@ -217,19 +217,20 @@ namespace MyAPI.Repositories
             return result.ToList();
         }
 
-        public List<KichPageModel> Getallkichs(string search,int page=1)
+        public List<KichPageModel> Getallkichs(string search)
         {
 
             //var allKichs = _context.Kiches.AsQueryable();
             //#region Filter
             //if (!string.IsNullOrEmpty(search))
             //{
-                var kichdienvien = (from k1 in _context.Kiches
+            var kichdienvien = (from k1 in _context.Kiches
                                 join dv1 in _context.KichDienviens on k1.MaKich equals dv1.MaKich
                                 join v1 in _context.Dienviens on dv1.MaDienVien equals v1.MaDienVien
                                 join kd1 in _context.KichDaodiens on k1.MaKich equals kd1.MaKich
                                 join dd1 in _context.Daodiens on kd1.MaDaodien equals dd1.MaDaoDien
-                                where k1.TrangThai==1 && k1.TenKich.Contains(search)
+                                where (k1.TrangThai == 1 && k1.TenKich.Contains(search)) || (k1.TrangThai == 1 && v1.TenDienVien!.Contains(search))
+                                ||(k1.TrangThai == 1 && dd1.TenDaoDien.Contains(search))
                                 select new
                                 {
                                     k1.MaKich,
@@ -250,7 +251,7 @@ namespace MyAPI.Repositories
                          {
                              k2.Key,
                              MoTa = k2.Select(p => p.MoTa).FirstOrDefault(),
-                             DaoDien = string.Join(',',k2.Select(p=>p.TenDaoDien).ToList().Distinct()),
+                             DaoDien = string.Join(',', k2.Select(p => p.TenDaoDien).ToList().Distinct()),
                              TenKich = k2.Select(p => p.TenKich).FirstOrDefault(),
                              TheLoai = k2.Select(p => p.TheLoai).FirstOrDefault(),
                              Image = k2.Select(p => p.Image).FirstOrDefault(),
@@ -269,9 +270,6 @@ namespace MyAPI.Repositories
                              NgayKt = x.NgayKt,
                              DienVien = x.DienVien,
                          });
-            #region Paging
-            group = group.Skip((page - 1) * PAGE_SIZE).Take(PAGE_SIZE);
-            #endregion
             var result = group.Select(k => new KichPageModel
             {
                 MoTa = k.MoTa,
@@ -283,12 +281,12 @@ namespace MyAPI.Repositories
                 NgayKt = k.NgayKt,
                 DienVien = k.DienVien
             });
-            
+
             return result.ToList();
 
         }
 
-        public async Task DuyetKich(string id,UpdateModel model)
+        public async Task DuyetKich(string id, UpdateModel model)
         {
             var updateKich = _mapper.Map<Kich>(model);
             updateKich = (from k in _context.Kiches
@@ -296,9 +294,9 @@ namespace MyAPI.Repositories
                           select k).SingleOrDefault();
 
             updateKich!.TrangThai = model.TrangThai;
-            
+
             _context.SaveChanges();
-                    
+
         }
     }
 }

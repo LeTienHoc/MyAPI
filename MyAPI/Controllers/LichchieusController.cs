@@ -143,9 +143,13 @@ namespace MyAPI.Controllers
             if (model.NgayBd < model.NgayKt)
             {
                 var ktralc = (from lc in _context.Lichchieus
-                              where lc.NgayBd <= model.NgayBd && lc.NgayKt >= model.NgayBd && lc.MaNhaKich == "" + mank + ""
+                              where lc.NgayBd < model.NgayBd && lc.NgayKt > model.NgayBd && lc.MaNhaKich == "" + mank + ""
                               select lc.MaLichChieu).ToList().Count();
-                if (ktralc == 0)
+                var ktralc1 = (from lc in _context.Lichchieus
+                               where lc.NgayBd > model.NgayBd && lc.MaNhaKich!.Equals(mank)
+                               select lc.MaLichChieu).Count();
+
+                if (ktralc <= 1 && ktralc1==0)
                 {
                     await _LichchieuRepo.Update(id, model);
                     return Ok();

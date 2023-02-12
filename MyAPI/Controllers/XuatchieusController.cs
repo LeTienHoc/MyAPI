@@ -45,7 +45,7 @@ namespace MyAPI.Controllers
                                 where nk.MaNhaKich == idtaikhoan
                                 select nk.MaNhaKich).SingleOrDefault()!.ToString();
                     var xuatchieu = (from kd in _context.Xuatchieus
-                                     join d in _context.Lichchieus on kd.MaLichChieu equals d.MaLichChieu
+                                     join d in _context.Lichchieus on kd.MaLichChieu equals d.MaLichChieu                                   
                                      where d.MaNhaKich!.Equals("" + mank + "")
                                      select new
                                      {
@@ -68,14 +68,20 @@ namespace MyAPI.Controllers
         [HttpGet]
         public async Task< IActionResult> GetAllXuatchieu()
         {
-            try
-            {
-                return Ok(await _XuatchieuRepo.GetAll());
-            }
-            catch
-            {
-                return BadRequest();
-            }
+            var xuatchieu = (from kd in _context.Xuatchieus
+                             join d in _context.Lichchieus on kd.MaLichChieu equals d.MaLichChieu
+                             join k in _context.Kiches on kd.MaKich equals k.MaKich
+                             select new
+                             {
+                                 MaXc = kd.MaXc,
+                                 MaKich = kd.MaKich,
+                                 MaLichChieu = kd.MaLichChieu,
+                                 NgayChieu = kd.NgayChieu,
+                                 ThoiGian = kd.Thoigian,
+                                 TenKich=k.TenKich,
+                                 MaNhaKich=d.MaNhaKich
+                             }).ToList();
+            return Ok(xuatchieu);
         }
 
         [HttpGet("{id}")]
@@ -99,6 +105,7 @@ namespace MyAPI.Controllers
                               where lc.NgayBd <= model.NgayChieu && lc.NgayKt >= model.NgayChieu && lc.MaNhaKich==""+mank+""
                               select lc.MaLichChieu).ToList()?.Count();
                 
+
                 if (select >= 1)
                 {
                     var kich = (from k in _context.Kiches

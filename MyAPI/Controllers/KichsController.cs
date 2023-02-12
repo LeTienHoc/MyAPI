@@ -133,6 +133,25 @@ namespace MyAPI.Controllers
             var Kich= await _KichRepo.GetByID(id);
             return  Kich==null ?NotFound():Ok(Kich);
         }
+        [HttpGet("TimKich")]
+        public async Task<IActionResult> GetKichByIdvaTen(string search)
+        {
+            var Kich = from x in _context.Kiches
+                       where x.MaKich.Equals(search) || x.TenKich.Contains(search)
+                       select new
+                       {
+                           MaKich = x.MaKich,
+                           MaNhaKich = x.MaNhaKich,
+                           MoTa = x.MoTa,
+                           TenKich = x.TenKich,
+                           TheLoai = x.TheLoai,
+                           Image = x.Image,
+                           NgayBd = x.NgayBd,
+                           NgayKt = x.NgayKt,
+                           TrangThai = x.TrangThai
+                       };
+            return Ok(Kich);
+        }
 
         [Authorize]
         [HttpPost]
@@ -262,7 +281,7 @@ namespace MyAPI.Controllers
         }
         [Route("Search")]
         [HttpGet]
-        public IActionResult GetallKichs(string search,int page=1)
+        public IActionResult GetallKichs(string search)
         { 
             try
             {
