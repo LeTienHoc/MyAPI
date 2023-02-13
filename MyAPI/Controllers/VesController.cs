@@ -61,7 +61,7 @@ namespace MyAPI.Controllers
         public async Task<IActionResult> AddNewVe(VeModel model)
         {
             
-            string id = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value!;
+            string id = HttpContext.User.FindFirst("ID")?.Value!;
             string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
             //var count = (from ghes in _context.Ghes
             //             where ghes.MaNhaKich!.Equals("NK000000002") 
@@ -75,9 +75,9 @@ namespace MyAPI.Controllers
                 //            where g.MaGhe.Equals(
 
                 //                model.MaGhe) && g.MaNhaKich.Equals("");
-                var makh = (from kh in _context.Khachhangs
-                            where kh.TenKh!.Equals(id)
-                            select kh.MaKh).SingleOrDefault()!.ToString();
+                //var makh = (from kh in _context.Khachhangs
+                //            where kh.TenKh!.Equals(id)
+                //            select kh.MaKh).SingleOrDefault()!.ToString();
                 var manhakich = (from xc in _context.Xuatchieus
                                  join k in _context.Kiches on xc.MaKich equals k.MaKich
                                  where xc.MaXc.Equals("" + model.MaXc + "")
@@ -122,12 +122,40 @@ namespace MyAPI.Controllers
                 });
             }    
         }
-        //public async Task<IActionResult> Thanhtoan()
-        //{
-        //    var ghedachon = (from gc in _context.Ves
-        //                     where 
-        //                     ).ToList();
-        //}
+        [Authorize]
+        [HttpGet("Thong Tin ve da mua")]
+        public async Task<IActionResult> Thongtinve()
+        {
+            string tenkh = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value!;
+            string id = HttpContext.User.FindFirst("ID")?.Value!;
+            
+            var thongtin = (from v in _context.Ves
+                           join xc in _context.Xuatchieus on v.MaXc equals xc.MaXc
+                           join g in _context.Ghes on v.MaGhe equals g.MaGhe
+                           where v.MaKh!.Equals(id) && v.NgayDatVe<=xc.NgayChieu
+                           select new
+                           {
+                               MaKh = tenkh,
+                               XuatChieu = xc.NgayChieu,
+                               Hang = g.Hang,
+                               Seat =g.Seat,
+                               Gia =v.TongGia
+                           }).ToList();
+            return Ok(thongtin);
+        }
+        [Authorize]
+        [HttpGet("Tong Tien")]
+        public async Task<IActionResult> Tonggia()
+        {
+           
+            string id = HttpContext.User.FindFirst("ID")?.Value!;
+
+            float tongtien = (float)(from v in _context.Ves
+                            join xc in _context.Xuatchieus on v.MaXc equals xc.MaXc
+                            where v.MaKh!.Equals(id) && v.NgayDatVe <= xc.NgayChieu
+                            select v.TongGia).Sum()!;
+            return Ok(tongtien);
+        }
         [Route("Ghe trong")]
         [HttpGet]
         public async Task<IActionResult> ShowGheConTrong(string xuatchieu)
@@ -159,109 +187,7 @@ namespace MyAPI.Controllers
             return Ok(c);
         }
 
-        //[HttpPost]
-        //[Authorize]
-        //[Route("Đặt Vé")]
-        //public async Task<IActionResult> DatVe(string mave,string maxc,string makh,string matk,string maghe, int soluong)
-        //{
-        //    string id = HttpContext.User.FindFirst(ClaimTypes.Name)?.Value!;
-        //    string idtaikhoan = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value!;
-        //    var count = (from ghes in _context.Ghes
-        //                 where ghes.Status == 0 && ghes.NhaKich!.Equals("NK000000002")
-        //                 select ghes.MaGhe).Count();
-
-        //    if (soluong == 0)
-        //    {
-        //        return BadRequest(new ApiResponse
-        //        {
-        //            Success = false,
-        //            Message = "Bạn chưa chọn số lượng ghế"
-        //        });
-        //    }
-        //    else
-        //    {
-        //        if (soluong > count)
-        //        {
-        //            return BadRequest(new ApiResponse
-        //            {
-        //                Success = false,
-        //                Message = "Số lượng ghế không đủ"
-        //            });
-        //        }
-        //        else
-        //        {
-
-        //            //input đầu vào (ng dùng chọn ghế nào trong ghée trống)
-        //            //hàm trả về các mã ghế ng ta chọn
-        //            //load danh sách các ghế còn trống
-        //            var ghe = (from g in _context.Ghes
-        //                       where g.NhaKich == "NK000000002" && g.MaGhe.Contains(maghe)
-        //                       select new
-        //                       {
-        //                           g.MaGhe,
-        //                           g.NhaKich,
-        //                           g.Hang,
-        //                           g.Seat,
-        //                           g.Status
-        //                       }).ToList();
-
-        //            //var result = ghe.Select(g=>new GheModel
-        //            //{
-        //            //    MaGhe=g.MaGhe,
-        //            //    NhaKich=g.NhaKich,
-        //            //    Hang=g.Hang,
-        //            //    Seat=g.Seat,
-        //            //    Status=g.Status
-        //            //}).ToList();
-
-        //            //List<GheModel> gheModels= new List<GheModel>();
-        //            //gheModels.AddRange(result);
-
-
-        //            //                 
-        //        }
-        //    }
-
-
-
-        //    if (id != null || idtaikhoan != null)
-        //    {
-        //        model.MaKh = id;
-        //        model.MaTk = idtaikhoan;
-        //        var newVeId = await _VeRepo.Add(model);
-
-        //        if (newVeId == "2")
-        //        {
-        //            return BadRequest(new ApiResponse
-        //            {
-        //                Success = false,
-        //                Message = "Ban chua chon ghe"
-        //            });
-        //        }
-        //        if (newVeId == "3")
-        //        {
-        //            return BadRequest(new ApiResponse
-        //            {
-        //                Success = false,
-        //                Message = "Ban chua chon xuat chieu"
-        //            });
-        //        }
-        //        else
-        //        {
-        //            var Ve = await _VeRepo.GetByID(newVeId);
-        //            return Ve == null ? NotFound() : Ok(Ve);
-        //        }
-
-        //    }
-        //    else
-        //    {
-        //        return BadRequest(new ApiResponse
-        //        {
-        //            Success = false,
-        //            Message = "Bạn chưa đăng nhập"
-        //        });
-        //    }
-        //}
+        
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateVe(string id,VeModel model)

@@ -36,7 +36,7 @@ namespace MyAPI.Controllers
 
             if (customer == null)
             {
-                return Ok(new ApiResponse
+                return BadRequest(new ApiResponse
                 {
                     Success = false,
                     Message = "Sai TenTaiKhoan/MatKhau",
